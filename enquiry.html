@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brew & Co. Coffee</title>
+    <link rel="stylesheet" href="styles/styles.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <a href="main.html"><img src="images/Logo_1.png" alt="Logo"></a>
+        </div>
+        
+        <ul class="nav-links">
+            <li class="dropdown">
+                <a href="product.html" class="dropbtn">MENU ▼</a>
+                <ul class="dropdown-menu">
+                    <li><a href="product3.html">Basic Brew</a></li>
+                    <li><a href="product1.html">Artisan Brew</a></li>
+                    <li><a href="product2.html">Non-Coffee</a></li>
+                    <li><a href="product4.html">Hot Beverages</a></li>
+        </ul>
+        </li>
+            
+            <li class="dropdown">
+                <a href="#" class="dropbtn">ACTIVITIES ▼</a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Coming Soon</a></li>
+                    <li><a href="#">Current</a></li>
+                    <li><a href="#">Past Activities</a></li>
+                </ul>
+            </li>
+            
+            <li><a href="joinus.html">JOIN US</a></li>
+            <li><a href="enquiry.html">ENQUIRY</a></li>
+            <li><a href="membership.html">MEMBERSHIP</a></li>
+            <li><a href="#">LOGIN</a></li>
+        </ul>
+    </nav>
+    
+
+    <div class="container">
+        <div class="enquiry-form">
+            <h2>Enquiry</h2>
+            <form>
+                <div class="form-group">
+                    <label for="first-name">First Name:</label>
+                    <input type="text" id="first-name" name="first-name" maxlength="25" required>
+
+                    <label for="last-name">Last Name:</label>
+                    <input type="text" id="last-name" name="last-name" maxlength="25" required>
+
+                    <label for="email">Email Address:</label>
+                    <input type="email" id="email" name="email" required><br><br>
+
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" name="phone" maxlength="10" placeholder="e.g. 0123456789" required><br><br>
+
+                    <label for="street">Street Address:</label>
+                    <input type="text" id="street" name="street" maxlength="40" required><br><br>
+        
+                    <label for="city">City/Town:</label>
+                    <input type="text" id="city" name="city" maxlength="20" required><br><br>
+        
+                    <label for="state">State:</label>
+                    <select id="state" name="state" required>
+                        <option value="">Select a state</option>
+                        <option value="Johor">Johor</option>
+                        <option value="Kedah">Kedah</option>
+                        <option value="Kelantan">Kelantan</option>
+                        <option value="Kuala Lumpur">Kuala Lumpur</option>
+                        <option value="Malacca">Malacca</option>
+                        <option value="Penang">Penang</option>
+                        <option value="Sabah">Sabah</option>
+                        <option value="Sarawak">Sarawak</option>
+                        <option value="Selangor">Selangor</option>
+                        <option value="Terengganu">Terengganu</option>
+                    </select><br><br>
+        
+                    <label for="postcode">Postcode:</label>
+                    <input type="text" id="postcode" name="postcode" maxlength="5" pattern="\d{5}" title="Enter exactly 5 digits" required><br><br>
+                
+                    <label for="enquiry-type">Type of Enquiry:</label>
+                    <select id="enquiry-type" name="enquiry-type" required>
+                        <option value="">Select</option>
+                        <option value="Membership">Membership</option>
+                        <option value="Products">Products</option>
+                        <option value="Pop-up Market activities">Pop-up Market Activities</option>
+                    </select><br><br>
+        
+                    <label for="message">Your Message:</label><br>
+                    <textarea id="message" name="message" rows="5" cols="50" required></textarea><br><br>
+                
+                </div>
+
+                <button type="submit">Submit</button>
+                <button type="reset">Reset</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-container">
+                <div class="footer-links">
+                    <span>About Us</span>
+                    <p><a href="#">Norman Zhi Wen Chung </a></p>
+                    <p><a href="#">Tammy Ru Xiu Tay</a></p>
+                    <p><a href="#">Miaw Fong Lim</a></p>
+                    <p><a href="#">Bahrose Hassan Babar</a></p>
+    
+                </div>
+            
+            <div class="footer-links">
+                <p>Acknowledgement <a href="#"></a></p>
+                <p>Presentation Video <a href="#"></a></p>
+                <p>Individual Task <a href="#"></a></p>
+                <p>Enhancement <a href="#"></a></p>
+            </div>
+
+            <!-- Social Media Icons -->
+            <div class="social-media">
+                <span>Follow Us</span>
+                <div class="social-icons">
+                    <a href="https://www.instagram.com/brewngo.coffee/"><img src="images/icons8-instagram-32.png" alt="Instagram"></a>
+                    <a href="https://web.facebook.com/people/Brew-Go-Coffee/61554234958482/"><img src="images/icons8-facebook-32.png" alt="Facebook"></a>
+                    <a href="mailto:brewngo.coffee@gmail.com"><img src="images/icons8-email-32.png" alt="Email"></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright Section -->
+        <div class="copyright">
+            © 2025 Brew & Go. Coffee. All rights reserved.
+        </div>
+    </footer>
+
+</body>
+</html>
