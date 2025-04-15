@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Our Menu - Brew & Go</title>
-  <link rel="stylesheet" href="styles/styles.css" />
+  <link rel="stylesheet" href="styles/style.css" />
 </head>
 <body>
 
@@ -15,12 +15,12 @@
   
   <ul class="nav-links">
       <li class="dropdown">
-          <a href="product.html" class="dropbtn">MENU ▼</a>
+          <a href="menu.html" class="dropbtn">MENU ▼</a>
           <ul class="dropdown-menu">
-              <li><a href="product3.html">Basic Brew</a></li>
-              <li><a href="product1.html">Artisan Brew</a></li>
-              <li><a href="product2.html">Non-Coffee</a></li>
-              <li><a href="product4.html">Hot Beverages</a></li>
+              <li><a href="menu3.html">Basic Brew</a></li>
+              <li><a href="menu1.html">Artisan Brew</a></li>
+              <li><a href="menu2.html">Non-Coffee</a></li>
+              <li><a href="menu4.html">Hot Beverages</a></li>
   </ul>
   </li>
       
@@ -41,7 +41,7 @@
 </nav>
 
 <!-- Join Us Section -->
-<section class="joinus-hero" style="background-image: url('images/Form_Background.png');">
+<section class="joinus-hero">
     <div class="joinus-overlay">
       <div class="joinus-container">
   
@@ -49,18 +49,19 @@
         <section class="joinus-section">
             <h2 class="section-title">Open Positions</h2>
             <div class="positions-wrapper">
-              <div class="position-card">
+              <a href="#joinus-form" class="position-card">
                 <div class="position-content">
                   <h3>Barista</h3>
                   <p>One Jaya Mall & Plaza Merdeka Mall</p>
                 </div>
-              </div>
-              <div class="position-card">
+              </a>
+              
+              <a href="#joinus-form" class="position-card">
                 <div class="position-content">
                   <h3>Cashier</h3>
                   <p>One Jaya Mall & Plaza Merdeka Mall</p>
                 </div>
-              </div>
+              </a>
             </div>
           </section>
           
@@ -70,7 +71,7 @@
             <h2 class="section-title">Benefits</h2>
             <div class="benefit-cards">
               <div class="benefit-card">
-                <img src="images/EPF & Socso.png" alt="EPF & Socso" />
+                <img src="images/EPF & Socso_2.png" alt="EPF & Socso" class="epf-logo"/>
                 <p>EPF & SOCSO</p>
               </div>
               <div class="benefit-card">
@@ -88,7 +89,7 @@
         <!-- Requirements -->
         <section class="joinus-section">
             <h2>Requirements</h2>
-            <p class="requirements-desc">We're looking for passionate team members who meet the following:</p>            
+            <p class="requirements-desc">We’re looking for passionate team members who meet the following:</p>            
           <ul class="requirement-list">
             <li><span>01</span> Age 18 years old & above</li>
             <li><span>02</span> Fluent in English, Mandarin & BM</li>
@@ -97,59 +98,118 @@
           </ul>
         </section>
   
-        <!-- Application Form -->
-        <section class="joinus-form-section">
-          <h2>Let's work together!</h2>
-          <form class="joinus-form" action="#" method="post" enctype="multipart/form-data">
-            <fieldset>
-              <label>Name:<input type="text" name="name" required></label>
-              <label>Address:<input type="text" name="address" required></label>
-              <label>Email Address:<input type="email" name="email" required></label>
-              <label>Phone Number:<input type="tel" name="phone" required></label>
-              <label>CV Upload:<input type="file" name="cv"></label>
-              <label>Upload Resume:<input type="file" name="resume"></label>
-              <div class="button-group">
-                <button type="submit">Submit</button>
-                <button type="reset">Reset</button>
-              </div>
-            </fieldset>
-          </form>
-        </section>
-  
+       <!-- Application Form -->
+       <section class="joinus-form-section" id="joinus-form">
+        <h2>Let's work together！</h2>
+  <form class="joinus-form" action="#" method="post" enctype="multipart/form-data">
+    <fieldset>
+      <label>First Name:
+        <input type="text" name="first_name" maxlength="25" pattern="[A-Za-z\s]+" required>
+      </label>
+
+      <label>Last Name:
+        <input type="text" name="last_name" maxlength="25" pattern="[A-Za-z\s]+" required>
+      </label>
+
+      <label>Email Address:
+        <input type="email" name="email" required>
+      </label>
+
+      <fieldset style="border: 1px solid #ccc; border-radius: 8px; padding: 15px;">
+        <legend><strong>Address</strong></legend>
+
+        <label>Street Address:
+          <input type="text" name="street" maxlength="40" required>
+        </label>
+
+        <label>City/Town:
+          <input type="text" name="city" maxlength="20" required>
+        </label>
+
+        <label>State:
+          <select name="state" required>
+            <option value="">-- Select State --</option>
+            <option value="Johor">Johor</option>
+            <option value="Kedah">Kedah</option>
+            <option value="Kelantan">Kelantan</option>
+            <option value="Malacca">Malacca</option>
+            <option value="Negeri Sembilan">Negeri Sembilan</option>
+            <option value="Pahang">Pahang</option>
+            <option value="Penang">Penang</option>
+            <option value="Perak">Perak</option>
+            <option value="Perlis">Perlis</option>
+            <option value="Sabah">Sabah</option>
+            <option value="Sarawak">Sarawak</option>
+            <option value="Selangor">Selangor</option>
+            <option value="Terengganu">Terengganu</option>
+            <option value="Kuala Lumpur">Kuala Lumpur</option>
+            <option value="Labuan">Labuan</option>
+            <option value="Putrajaya">Putrajaya</option>
+          </select>
+        </label>
+
+        <label>Postcode:
+          <input type="text" name="postcode" pattern="\d{5}" maxlength="5" required>
+        </label>
+      </fieldset>
+
+      <label>Phone Number:
+        <input type="tel" name="phone" maxlength="10" placeholder="e.g. 0123456789" required>
+      </label>
+
+      <label>CV Upload:
+        <input type="file" name="cv" accept=".doc,.docx,.pdf">
+      </label>
+
+      <label>Photo Upload:
+        <input type="file" name="photo" accept="image/*">
+      </label>
+
+
+      <div class="button-group">
+        <button type="submit" class="btn-submit">Submit</button>
+        <button type="reset" class="btn-reset">Reset</button>
       </div>
-    </div>
-  </section>  
-  
+      
+    </fieldset>
+  </form>
+</div>
+</div>
+</section>
 
 <!-- Footer -->
 <footer>
-  <div class="footer-container">
-    <div class="footer-links">
-      <span>About Us</span>
-      <p><a href="#">Norman Zhi Wen Chung</a></p>
-      <p><a href="#">Tammy Ru Xiu Tay</a></p>
-      <p><a href="#">Miaw Fong Lim</a></p>
-      <p><a href="#">Bahrose Hassan Babar</a></p>
-    </div>
-    <div class="footer-links">
-      <p>Acknowledgement</p>
-      <p>Presentation Video</p>
-      <p>Individual Task</p>
-      <p>Enhancement</p>
-    </div>
-    <div class="social-media">
-        <span>Follow Us</span>
-        <div class="social-icons">
-            <a href="https://www.instagram.com/brewngo.coffee/"><img src="images/icons8-instagram-32.png" alt="Instagram"></a>
-            <a href="https://web.facebook.com/people/Brew-Go-Coffee/61554234958482/"><img src="images/icons8-facebook-32.png" alt="Facebook"></a>
-            <a href="mailto:brewngo.coffee@gmail.com"><img src="images/icons8-email-32.png" alt="Email"></a>
+        <div class="footer-container">
+            <div class="footer-links">
+                <span>About Us</span>
+                <p><a href="#">Norman Zhi Wen Chung </a></p>
+                <p><a href="#">Tammy Ru Xiu Tay</a></p>
+                <p><a href="#">Miaw Fong Lim</a></p>
+                <p><a href="#">Bahrose Hassan Babar</a></p>
+
+            </div>
+        
+            <div class="footer-links">
+                <p>Acknowledgement <a href=""></a></p>
+                <p>Presentation Video <a href="#"></a></p>
+                <p>Individual Task <a href="#"></a></p>
+                <p>Enhancement <a href="#"></a></p>
+            </div>
+
+            <div class="social-media">
+                <span>Follow Us</span>
+                <div class="social-icons">
+                    <a href="https://www.instagram.com/brewngo.coffee/"><img src="images/icons8-instagram-32.png" alt="Instagram"></a>
+                    <a href="https://web.facebook.com/people/Brew-Go-Coffee/61554234958482/"><img src="images/icons8-facebook-32.png" alt="Facebook"></a>
+                    <a href="mailto:brewngo.coffee@gmail.com"><img src="images/icons8-email-32.png" alt="Email"></a>
+                </div>
+            </div>
         </div>
-    </div>
-  </div>
-  <div class="copyright">
-    © 2025 Brew & Go. Coffee. All rights reserved.
-  </div>
-</footer>
+
+        <div class="copyright">
+            © 2025 Brew & Go. Coffee. All rights reserved.
+        </div>
+    </footer>
 
 </body>
 </html>
