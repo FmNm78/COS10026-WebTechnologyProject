@@ -8,6 +8,8 @@
 </head>
 <body>
 
+    <div id="top"></div>
+
     <header>
         <nav class="navbar">
           <div class="logo">
@@ -45,43 +47,94 @@
     
 
 
-    <section class="registration-hero">
-        <div class="registration-overlay">
-          <div class="registration-container">
-            <section class="registration-form-section">
-              <h2>Membership Registration</h2>
-              <form class="registration-form" action="#" method="post">
-                <fieldset>
-                  <label>First Name:
-                    <input type="text" name="first_name" maxlength="25" pattern="[A-Za-z\s]+" required>
-                  </label>
-      
-                  <label>Last Name:
-                    <input type="text" name="last_name" maxlength="25" pattern="[A-Za-z\s]+" required>
-                  </label>
-      
-                  <label>Email Address:
-                    <input type="email" name="email" required>
-                  </label>
-      
-                  <label>Login ID:
-                    <input type="text" name="login_id" maxlength="10" pattern="[A-Za-z\s]+" required>
-                  </label>
-      
-                  <label>Password:
-                    <input type="text" name="password" maxlength="25" pattern="[A-Za-z\s]+" required>
-                  </label>
-      
-                  <div class="registration-button-group">
-                    <button type="submit" class="btn-registration-submit">Submit</button>
-                    <button type="reset" class="btn-registration-reset">Reset</button>
-                  </div>
-                </fieldset>
-              </form>
+<!-- Membership Page -->
+<section class="membership-hero">
+    <div class="membership-overlay">
+  
+      <!-- Top Section: Membership Info + QR -->
+      <section class="membership-container">
+        <div class="membership-content">
+          <div class="membership-details">
+            <section class="membership-benefit-section">
+              <h2 class="membership-section-title">Membership Perks</h2>
+              <div class="membership-text-cards">
+                <div class="membership-text-card">
+                  <h4>Exclusive Prices</h4>
+                  <p>Members can enjoy exclusive member prices.</p>
+                </div>
+                <div class="membership-text-card">
+                  <h4>Lucky Draw</h4>
+                  <p>A more attractive lucky draw prizes awaits.</p>
+                </div>
+                <div class="membership-text-card">
+                  <h4>Free Drinks</h4>
+                  <p>Psst: you may even get free drinks from us for <strong>FIVE DAYS STRAIGHT!!</strong></p>
+                </div>
+              </div>
+                          
+            </section>
+  
+            <section class="membership-requirements">
+              <h3 class="membership-section-title">Requirements</h3>
+              <p class="membership-requirements-desc">Here’s what it takes to unlock our member privileges:</p>
+              <ul class="membership-requirement-list">
+                <li><span>01</span> Top-up RM30, RM50, RM100 or RM200</li>
+                <li><span>02</span> Credit is stored & non-refundable</li>
+                <li><span>03</span> Lifetime membership (no expiry)</li>
+                <li><span>04</span> Minimum RM30 required if balance is insufficient</li>
+              </ul>
             </section>
           </div>
+  
+          <div class="membership-qr-card">
+            <h4 class="membership-qr-title">DUIT NOW</h4>
+            <img src="images/membership_qr.png" alt="DuitNow QR Code" class="membership-qr-img">
+            <p class="membership-qr-caption">Brew And Go SDN BHD</p>
+          </div>
+          
         </div>
       </section>
+  
+      <!-- Bottom Section: Registration Form -->
+      <section class="membership-form-section">
+        <h2>Membership Registration</h2>
+        <form class="membership-form" action="#" method="post">
+          <fieldset>
+            <label>First Name:
+              <input type="text" name="first_name" maxlength="25" pattern="[A-Za-z\s]+" required>
+            </label>
+  
+            <label>Last Name:
+              <input type="text" name="last_name" maxlength="25" pattern="[A-Za-z\s]+" required>
+            </label>
+  
+            <label>Email Address:
+              <input type="email" name="email" required>
+            </label>
+  
+            <label>Login ID:
+              <input type="text" name="login" required>
+            </label>
+  
+            <label>Password:
+              <input type="text" name="password" required>
+            </label>
+
+            <label>Payment Slip Upload:
+                <input type="file" name="payment_slip" accept=".jpg,.jpeg,.png,.pdf" required>
+              </label>              
+  
+            <div class="membership-button-group">
+              <button type="submit" class="btn-membership-submit">Submit</button>
+              <button type="reset" class="btn-membership-reset">Reset</button>
+            </div>
+  
+          </fieldset>
+        </form>
+      </section>
+    </div>
+  </section>
+  
       
       
       
@@ -119,6 +172,10 @@
             © 2025 Brew & Go. Coffee. All rights reserved.
         </div>
     </footer>
+
+    <a href="#top" class="back-to-top">
+        <span>↑</span>
+      </a>
 
 </body>
 </html>
