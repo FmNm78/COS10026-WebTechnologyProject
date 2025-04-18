@@ -8,32 +8,45 @@
 </head>
 <body class="acknowledgement-page">
 
+
+<div id="top"></div>
+
 <!-- Navbar -->
-<nav class="navbar">
-  <input type="checkbox" id="menu-toggle" class="menu-toggle">
-  <label for="menu-toggle" class="hamburger">&#9776;</label>
-  <div class="mobile-dropdown-menu">
-    <ul>
-      <li><a href="menu.html">MENU</a></li>
-      <li><a href="activities.html">ACTIVITIES</a></li>
-      <li><a href="joinus.html">JOIN US</a></li>
-      <li><a href="enquiry.html">ENQUIRY</a></li>
-      <li><a href="membership.html">MEMBERSHIP</a></li>
-      <li><a href="login.html">LOGIN</a></li>
-    </ul>
-  </div>
-  <div class="logo">
-    <a href="main.html"><img src="images/Logo_1.png" alt="Logo"></a>
-  </div>
-  <ul class="nav-links">
-    <li><a href="main.html">HOME</a></li>
-    <li><a href="product.html">MENU</a></li>
-    <li><a href="joinus.html">JOIN US</a></li>
-    <li><a href="enquiry.html">ENQUIRY</a></li>
-    <li><a href="membership.html">MEMBERSHIP</a></li>
-    <li><a href="login.html">LOGIN</a></li>
-  </ul>
-</nav>
+<header>
+    <nav class="navbar">
+      <div class="logo">
+          <a href="main.html"><img src="images/Logo_1.png" alt="Logo"></a>
+      </div>
+      
+      <ul class="nav-links">
+          <li class="dropdown">
+              <a href="menu.html" class="dropbtn">MENU ▼</a>
+              <ul class="dropdown-menu">
+                  <li><a href="menu3.html">Basic Brew</a></li>
+                  <li><a href="menu1.html">Artisan Brew</a></li>
+                  <li><a href="menu2.html">Non-Coffee</a></li>
+                  <li><a href="menu4.html">Hot Beverages</a></li>
+      </ul>
+      
+      </li>
+          
+          <li class="dropdown">
+              <a href="activities.html" class="dropbtn">ACTIVITIES ▼</a>
+              <ul class="dropdown-menu">
+                  <li><a href="coming_soon.html">Coming Soon</a></li>
+                  <li><a href="current.html">Current</a></li>
+                  <li><a href="past_activities.html">Past Activities</a></li>
+              </ul>
+          </li>
+          
+          <li><a href="joinus.html">JOIN US</a></li>
+          <li><a href="enquiry.html">ENQUIRY</a></li>
+          <li><a href="membership.html">MEMBERSHIP</a></li>
+          <li><a href="login.html">LOGIN</a></li>
+      </ul>
+    </nav>
+    </header>
+    
 
 <!-- Acknowledgement Content -->
 <main style="padding: 40px;">
@@ -148,6 +161,10 @@
     © 2025 Brew & Go. Coffee. All rights reserved.
   </div>
 </footer>
+
+<a href="#top" class="back-to-top">
+    <span>↑</span>
+  </a>
 
 </body>
 </html>
