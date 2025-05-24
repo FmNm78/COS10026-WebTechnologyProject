@@ -1,4 +1,12 @@
 <?php
-// connection.php
-// Auto-generated placeholder. Fill with logic as needed.
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "assignment_2";
+
+$conn = mysqli_connect($servername, $username, $password, $dbname);
+
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
 ?>

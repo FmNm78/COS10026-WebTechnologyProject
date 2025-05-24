@@ -48,7 +48,7 @@
             <h2 class="section-title">Benefits</h2>
             <div class="benefit-cards">
               <div class="benefit-card">
-                <img src="images/EPF & Socso_2.png" alt="EPF & Socso" class="epf-logo"/>
+                <img src="images/EPF & Socso.png" alt="EPF & Socso" class="epf-logo"/>
                 <p>EPF & SOCSO</p>
               </div>
               <div class="benefit-card">
@@ -78,7 +78,7 @@
        <!-- Application Form -->
        <section class="joinus-form-section" id="joinus-form">
         <h2>Let's work together！</h2>
-  <form class="joinus-form" action="#" method="post" enctype="multipart/form-data">
+  <form class="joinus-form" action="process_joinus.php" method="post" enctype="multipart/form-data">
     <fieldset>
       <label>First Name:
         <input type="text" name="first_name" maxlength="25" pattern="[A-Za-z\s]+" required>

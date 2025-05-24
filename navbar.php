@@ -1,3 +1,27 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) session_start();
+
+// Check if member is logged in
+$is_member_logged_in = isset($_SESSION['user_id']) && isset($_SESSION['membership_id']);
+
+$member_full_name = '';
+if ($is_member_logged_in) {
+    require_once 'connection.php';
+    $membership_id = $_SESSION['membership_id'] ?? 0;
+    $sql = "SELECT first_name, last_name FROM membership WHERE id = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $membership_id);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $first_name, $last_name);
+    if (mysqli_stmt_fetch($stmt)) {
+        $member_full_name = htmlspecialchars($first_name . ' ' . $last_name);
+    }
+    mysqli_stmt_close($stmt);
+    mysqli_close($conn);
+}
+?>
+
+
 <nav class="navbar">
     <input type="checkbox" id="menu-toggle" class="menu-toggle">
     <label for="menu-toggle" class="hamburger">&#9776;</label>
@@ -7,8 +31,13 @@
         <li><a href="activities.php">ACTIVITIES</a></li>
         <li><a href="joinus.php">JOIN US</a></li>
         <li><a href="enquiry.php">ENQUIRY</a></li>
-        <li><a href="membership.php">MEMBERSHIP</a></li>
-        <li><a href="login.php">LOGIN</a></li>
+        <?php if ($is_member_logged_in): ?>
+            <li><a href="profile.php"><?= $member_full_name ?></a></li>
+            <li><a href="logout.php">LOGOUT</a></li>
+        <?php else: ?>
+            <li><a href="membership.php">MEMBERSHIP</a></li>
+            <li><a href="login.php">LOGIN</a></li>
+        <?php endif; ?>
       </ul>
     </div>
     <div class="logo">
@@ -34,10 +63,14 @@
                 <li><a href="past_activities.php">Past Activities</a></li>
             </ul>
         </li>
-        
         <li><a href="joinus.php">JOIN US</a></li>
         <li><a href="enquiry.php">ENQUIRY</a></li>
-        <li><a href="membership.php">MEMBERSHIP</a></li>
-        <li><a href="login.php">LOGIN</a></li>
+        <?php if ($is_member_logged_in): ?>
+            <li><a href="profile.php"><?= $member_full_name ?></a></li>
+            <li><a href="logout.php">LOGOUT</a></li>
+        <?php else: ?>
+            <li><a href="membership.php">MEMBERSHIP</a></li>
+            <li><a href="login.php">LOGIN</a></li>
+        <?php endif; ?>
     </ul>
   </nav>
