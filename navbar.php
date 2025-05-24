@@ -1,11 +1,13 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-// Check if member is logged in
+// --- Determine login status ---
+$is_admin_logged_in = isset($_SESSION['admin_id']) && ($_SESSION['role_id'] ?? 0) == 1;
 $is_member_logged_in = isset($_SESSION['user_id']) && isset($_SESSION['membership_id']);
 
+// Get member full name if logged in
 $member_full_name = '';
-if ($is_member_logged_in) {
+if ($is_member_logged_in && !$is_admin_logged_in) {
     require_once 'connection.php';
     $membership_id = $_SESSION['membership_id'] ?? 0;
     $sql = "SELECT first_name, last_name FROM membership WHERE id = ?";
@@ -21,7 +23,6 @@ if ($is_member_logged_in) {
 }
 ?>
 
-
 <nav class="navbar">
     <input type="checkbox" id="menu-toggle" class="menu-toggle">
     <label for="menu-toggle" class="hamburger">&#9776;</label>
@@ -31,7 +32,10 @@ if ($is_member_logged_in) {
         <li><a href="activities.php">ACTIVITIES</a></li>
         <li><a href="joinus.php">JOIN US</a></li>
         <li><a href="enquiry.php">ENQUIRY</a></li>
-        <?php if ($is_member_logged_in): ?>
+        <?php if ($is_admin_logged_in): ?>
+            <li><a href="admin_dashboard.php">View</a></li>
+            <li><a href="logout.php">LOGOUT</a></li>
+        <?php elseif ($is_member_logged_in): ?>
             <li><a href="profile.php"><?= $member_full_name ?></a></li>
             <li><a href="logout.php">LOGOUT</a></li>
         <?php else: ?>
@@ -52,9 +56,8 @@ if ($is_member_logged_in) {
                 <li><a href="menu1.php">Artisan Brew</a></li>
                 <li><a href="menu2.php">Non-Coffee</a></li>
                 <li><a href="menu4.php">Hot Beverages</a></li>
-    </ul>
-    </li>
-        
+            </ul>
+        </li>
         <li class="dropdown">
             <a href="activities.php" class="dropbtn">ACTIVITIES ▼</a>
             <ul class="dropdown-menu">
@@ -65,7 +68,10 @@ if ($is_member_logged_in) {
         </li>
         <li><a href="joinus.php">JOIN US</a></li>
         <li><a href="enquiry.php">ENQUIRY</a></li>
-        <?php if ($is_member_logged_in): ?>
+        <?php if ($is_admin_logged_in): ?>
+            <li><a href="admin_dashboard.php">ADMIN</a></li>
+            <li><a href="logout.php">LOGOUT</a></li>
+        <?php elseif ($is_member_logged_in): ?>
             <li><a href="profile.php"><?= $member_full_name ?></a></li>
             <li><a href="logout.php">LOGOUT</a></li>
         <?php else: ?>
@@ -73,4 +79,4 @@ if ($is_member_logged_in) {
             <li><a href="login.php">LOGIN</a></li>
         <?php endif; ?>
     </ul>
-  </nav>
+</nav>

@@ -3855,14 +3855,6 @@ body.login-page::before {
   text-decoration: none;
 }
 
-.admin-view-payment_slip{
-  width:60px;
-  height:60px;
-  object-fit:cover;
-  border-radius:5px;
-  border:1px solid #ccc;
-}
-
 .btn-view-pdf{
   background-color: #2f0ba3;
   color: white;
@@ -3913,6 +3905,125 @@ body.login-page::before {
 .admin-view-enquiries-body .view-msg-btn:hover {
     background: #285994;
 }
+
+.btn-view-pdf {
+    background: #2f0ba3;
+    color: white;
+    padding: 7px 18px;
+    border-radius: 6px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-view-pdf:hover {
+    background: #3717c7;
+}
+
+.admin-view-payment_slip {
+    max-width: 150px;
+    max-height: 1500px;
+    border-radius: 5px;
+    border: 1px solid #e2e2e2;
+}
+
+.job-details-row {
+  display: none;
+  background: #f8f9fa;
+}
+
+.job-details-content {
+  padding: 18px 24px;
+}
+
+.job-photo img {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 8px;
+  margin-top: 30px;
+}
+
+.job-details-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+
+.job-details-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid #eee;
+  vertical-align: top;
+}
+
+.btn-view-details {
+  background: #2f0ba3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-view-details:hover {
+  background: #1c0870;
+}
+
+.job-details-flex-media{
+  display:flex;
+  flex-direction: row;
+  width:100%;
+  justify-content: space-around;
+}
+
+.btn-view-pdf {
+  background: #008080;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-view-pdf:hover { background: #016161; }
+
+.job-details-flex-media {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    margin-top: 18px;
+}
+.job-photo, .job-photo-img img {
+    display: block;
+    max-width: 140px;
+    max-height: 140px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    object-fit: cover;
+}
+.job-cv-preview {
+    margin-top: 12px;
+    width: 380px;
+    min-height: 300px;
+    border: 1px solid #c6c6c6;
+    border-radius: 8px;
+    background: #fafafe;
+    box-shadow: 0 4px 24px rgba(32,32,32,0.05);
+}
+.btn-view-pdf, .btn-download-pdf {
+    background: #2f0ba3;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 6px 8px 4px 0;
+    transition: background 0.2s;
+    display: inline-block;
+}
+.btn-view-pdf:hover, .btn-download-pdf:hover { background: #1c0870; }
 
 
 /* Responsive Layout */
