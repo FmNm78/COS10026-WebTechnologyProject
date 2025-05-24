@@ -24,34 +24,16 @@ $result = mysqli_query($conn, "
     <meta charset="UTF-8" />
     <title>All Job Applications | Brew & Go Admin</title>
     <link rel="stylesheet" href="styles/style.css" />
-    <style>
-        .job-details-row { display: none; background: #f8f9fa; }
-        .job-details-content { padding: 18px 24px; }
-        .admin-view-payment_slip, .job-photo-img { max-width:60px;max-height:60px;border-radius:6px;}
-        .job-details-table { width: 100%; border-collapse: collapse; }
-        .job-details-table td { padding: 6px 12px; border-bottom: 1px solid #eee; }
-        .btn-view-details {
-            background: #2f0ba3;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 6px 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-view-details:hover { background: #1c0870; }
-    </style>
     <script>
         function toggleDetails(rowId) {
-            var d = document.getElementById('details-'+rowId);
+            var d = document.getElementById('details-' + rowId);
             d.style.display = d.style.display === 'table-row' ? 'none' : 'table-row';
         }
     </script>
 </head>
 <body class="admin-members-body">
     <?php include 'navbar.php'; ?>
-<div class="admin-wrapper">
+    <div class="admin-wrapper">
     <?php include 'admin_sidebar.php'; ?>
     <div class="admin-main">
         <header class="admin-topbar">
@@ -104,13 +86,12 @@ $result = mysqli_query($conn, "
                                         <td><?= htmlspecialchars($row['state']) ?></td>
                                     </tr>
                                 </table>
-                                <!-- Vertically stack media -->
                                 <div class="job-details-flex-media">
                                     <div>
                                         <strong>Photo:</strong><br>
                                         <?php if ($row['photo_path']): ?>
                                             <a href="<?= htmlspecialchars($row['photo_path']) ?>" target="_blank" class="job-photo">
-                                                <img src="<?= htmlspecialchars($row['photo_path']) ?>" alt="Photo" >
+                                                <img src="<?= htmlspecialchars($row['photo_path']) ?>" alt="Photo" class="job-photo-img">
                                             </a>
                                         <?php else: ?>
                                             <span>N/A</span>
@@ -120,24 +101,25 @@ $result = mysqli_query($conn, "
                                         <strong>CV:</strong><br>
                                         <?php if ($row['cv_path']): ?>
                                             <?php
-                                            $cv_path = htmlspecialchars($row['cv_path']);
+                                            $cv_path = $row['cv_path'];
                                             $cv_ext = strtolower(pathinfo($row['cv_path'], PATHINFO_EXTENSION));
-                                            if ($cv_ext === 'pdf'): ?>
-                                                <!-- View PDF (new tab) -->
-                                                <a href="<?= $cv_path ?>" target="_blank">
-                                                    <button type="button" class="btn-view-pdf">View PDF</button>
-                                                </a>
-                                                <!-- Download PDF -->
-                                                <a href="<?= $cv_path ?>" download>
-                                                    <button type="button" class="btn-download-pdf">Download PDF</button>
-                                                </a>
-                                                <!-- Inline PDF preview -->
-                                                <div class="job-cv-preview">
-                                                    <iframe src="<?= $cv_path ?>" width="100%" height="300" style="border:0;border-radius:8px;" allowfullscreen webkitallowfullscreen></iframe>
+                                            ?>
+                                            <?php if ($cv_ext === 'pdf'): ?>
+                                                <div class="jov-cv-wrapper">
+                                                    <div class="job-cv-preview">
+                                                        <iframe src="<?= htmlspecialchars($cv_path) ?>" class="job-cv-iframe"></iframe>
+                                                    </div>
+                                                    <div class="job-cv-action-row">
+                                                        <a href="<?= htmlspecialchars($cv_path) ?>" target="_blank">
+                                                            <button type="button" class="btn-view-pdf">View PDF in New Tab</button>
+                                                        </a>
+                                                        <a href="<?= htmlspecialchars($cv_path) ?>" download>
+                                                            <button type="button" class="btn-download-pdf">Download PDF</button>
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             <?php else: ?>
-                                                <!-- For other file types: Download only -->
-                                                <a href="<?= $cv_path ?>" download>
+                                                <a href="<?= htmlspecialchars($cv_path) ?>" download>
                                                     <button type="button" class="btn-download-pdf">Download</button>
                                                 </a>
                                             <?php endif; ?>
@@ -145,6 +127,7 @@ $result = mysqli_query($conn, "
                                             <span>N/A</span>
                                         <?php endif; ?>
                                     </div>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -153,6 +136,6 @@ $result = mysqli_query($conn, "
             </table>
         </section>
     </div>
-</div>
+    </div>
 </body>
 </html>

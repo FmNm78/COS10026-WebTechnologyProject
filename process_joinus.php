@@ -1,119 +1,140 @@
 <?php
+session_start();
 require_once 'connection.php';
 
-function clean($data) {
-    return htmlspecialchars(trim($data));
-}
+function clean($data) { return htmlspecialchars(trim($data)); }
 
-// Default response
-$response_type = '';
-$response_msg = '';
-
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $first_name      = clean($_POST['first_name'] ?? '');
-    $last_name       = clean($_POST['last_name'] ?? '');
-    $email           = clean($_POST['email'] ?? '');
-    $street          = clean($_POST['street'] ?? '');
-    $city            = clean($_POST['city'] ?? '');
-    $state           = clean($_POST['state'] ?? '');
-    $postcode        = clean($_POST['postcode'] ?? '');
-    $phone           = clean($_POST['phone'] ?? '');
-    $preferred_shift = clean($_POST['shift'] ?? '');
+    // Save all user input except files
+    $form_data = [
+        'first_name'      => clean($_POST['first_name'] ?? ''),
+        'last_name'       => clean($_POST['last_name'] ?? ''),
+        'email'           => clean($_POST['email'] ?? ''),
+        'street'          => clean($_POST['street'] ?? ''),
+        'city'            => clean($_POST['city'] ?? ''),
+        'state'           => clean($_POST['state'] ?? ''),
+        'postcode'        => clean($_POST['postcode'] ?? ''),
+        'phone'           => clean($_POST['phone'] ?? ''),
+        'shift'           => clean($_POST['shift'] ?? ''),
+    ];
 
-    // Validate required fields
-    if (!$first_name || !$last_name || !$email || !$street || !$city || !$state || !$postcode || !$phone || !$preferred_shift) {
-        $response_type = 'error';
-        $response_msg = 'All required fields must be filled in!';
-    } else {
-        // Handle uploads
-        $cv_path = '';
-        $photo_path = '';
-
-        // CV
-        if (isset($_FILES['cv']) && $_FILES['cv']['error'] === 0) {
-            $allowed_cv = ['pdf', 'doc', 'docx'];
-            $cv_ext = strtolower(pathinfo($_FILES['cv']['name'], PATHINFO_EXTENSION));
-            if (!in_array($cv_ext, $allowed_cv)) {
-                $response_type = 'error';
-                $response_msg = 'Invalid CV file type.';
-            } else {
-                $cv_path = "uploads/cv_" . uniqid() . "." . $cv_ext;
-                move_uploaded_file($_FILES['cv']['tmp_name'], $cv_path);
-            }
-        }
-
-        // Photo
-        if ($response_type !== 'error' && isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
-            if ($_FILES['photo']['size'] > 200 * 1024) {
-                $response_type = 'error';
-                $response_msg = 'Photo too large (max 200KB).';
-            } else {
-                $photo_ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
-                $allowed_photo = ['jpg','jpeg','png','gif','webp'];
-                if (!in_array($photo_ext, $allowed_photo)) {
-                    $response_type = 'error';
-                    $response_msg = 'Invalid photo file type.';
-                } else {
-                    $photo_path = "uploads/photo_" . uniqid() . "." . $photo_ext;
-                    move_uploaded_file($_FILES['photo']['tmp_name'], $photo_path);
-                }
-            }
-        }
-
-        // Only insert if no upload errors
-        if ($response_type !== 'error') {
-            $sql = "INSERT INTO job_application 
-                (first_name, last_name, email, phone, preferred_shift, address, postcode, city, state, photo_path, cv_path) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt = mysqli_prepare($conn, $sql);
-            $address = $street;
-
-            mysqli_stmt_bind_param($stmt, "sssssssssss", 
-                $first_name, $last_name, $email, $phone, $preferred_shift, 
-                $address, $postcode, $city, $state, $photo_path, $cv_path
-            );
-
-            if (mysqli_stmt_execute($stmt)) {
-                $response_type = 'success';
-                $response_msg = 'Your application was submitted successfully!';
-            } else {
-                $response_type = 'error';
-                $response_msg = 'Failed to submit application: ' . mysqli_error($conn);
-            }
-            mysqli_stmt_close($stmt);
+    // Validation
+    foreach (['first_name','last_name','email','street','city','state','postcode','phone','shift'] as $f) {
+        if (empty($form_data[$f])) {
+            $_SESSION['joinus_form'] = $form_data;
+            $_SESSION['joinus_form_error'] = 'All required fields must be filled in!';
+            header('Location: joinus.php');
+            exit;
         }
     }
+
+    // --- Validate and save CV ---
+    $cv_path = '';
+    if (isset($_FILES['cv']) && $_FILES['cv']['error'] === UPLOAD_ERR_OK) {
+        $allowed_cv_ext = ['pdf','doc','docx'];
+        $cv_ext = strtolower(pathinfo($_FILES['cv']['name'], PATHINFO_EXTENSION));
+        if ($_FILES['cv']['size'] > 200 * 1024) {
+            $_SESSION['joinus_form'] = $form_data;
+            $_SESSION['joinus_form_error'] = 'CV too large (max 200KB).';
+            header('Location: joinus.php');
+            exit;
+        }
+        if (!in_array($cv_ext, $allowed_cv_ext)) {
+            $_SESSION['joinus_form'] = $form_data;
+            $_SESSION['joinus_form_error'] = 'Invalid CV file type. Only PDF, DOC, DOCX allowed.';
+            header('Location: joinus.php');
+            exit;
+        }
+        $cv_dir = __DIR__ . '/uploads/cvs/';
+
+        if (!is_dir($cv_dir)) mkdir($cv_dir, 0777, true);
+
+        $basename = pathinfo($_FILES['cv']['name'], PATHINFO_FILENAME);
+        $safe_basename = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $basename);
+        $cv_filename = $safe_basename . '_' . uniqid() . '.' . $cv_ext;
+        $cv_server_path = $cv_dir . $cv_filename;
+        $cv_path = 'uploads/cvs/' . $cv_filename;
+
+        if (!move_uploaded_file($_FILES['cv']['tmp_name'], $cv_server_path)) {
+            $_SESSION['joinus_form'] = $form_data;
+            $_SESSION['joinus_form_error'] = 'Failed to upload CV.';
+            header('Location: joinus.php');
+            exit;
+        }
+    }
+
+
+
+    // --- Validate and save photo ---
+    $photo_path = '';
+    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+        $allowed_photo_ext = ['jpg','jpeg','png','gif','webp'];
+        $photo_ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+        if ($_FILES['photo']['size'] > 500 * 1024) {
+            $_SESSION['joinus_form'] = $form_data;
+            $_SESSION['joinus_form_error'] = 'Photo too large (max 500KB).';
+            header('Location: joinus.php');
+            exit;
+        }
+        if (!in_array($photo_ext, $allowed_photo_ext)) {
+            $_SESSION['joinus_form'] = $form_data;
+            $_SESSION['joinus_form_error'] = 'Invalid photo file type.';
+            header('Location: joinus.php');
+            exit;
+        }
+        $photo_dir = 'uploads/photos/';
+        if (!is_dir($photo_dir)) mkdir($photo_dir, 0777, true);
+        $photo_path = $photo_dir . 'photo_' . uniqid() . '.' . $photo_ext;
+        if (!move_uploaded_file($_FILES['photo']['tmp_name'], $photo_path)) {
+            $_SESSION['joinus_form'] = $form_data;
+            $_SESSION['joinus_form_error'] = 'Failed to upload photo.';
+            header('Location: joinus.php');
+            exit;
+        }
+    }
+
+    // All OK, insert to DB
+    $sql = "INSERT INTO job_application 
+            (first_name, last_name, email, phone, preferred_shift, address, postcode, city, state, photo_path, cv_path) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($conn, $sql);
+    $address = $form_data['street'];
+    mysqli_stmt_bind_param($stmt, "sssssssssss", 
+        $form_data['first_name'], $form_data['last_name'], $form_data['email'], $form_data['phone'], $form_data['shift'],
+        $address, $form_data['postcode'], $form_data['city'], $form_data['state'], $photo_path, $cv_path
+    );
+    if (mysqli_stmt_execute($stmt)) {
+        // Success: clear form data
+        unset($_SESSION['joinus_form'], $_SESSION['joinus_form_error']);
+        $response_type = 'success';
+        $response_msg = 'Your application was submitted successfully!';
+    } else {
+        $_SESSION['joinus_form'] = $form_data;
+        $_SESSION['joinus_form_error'] = 'Failed to submit application: ' . mysqli_error($conn);
+        header('Location: joinus.php');
+        exit;
+    }
+    mysqli_stmt_close($stmt);
     mysqli_close($conn);
 } else {
-    $response_type = 'error';
-    $response_msg = 'Invalid request.';
+    header('Location: joinus.php');
+    exit;
 }
 ?>
-
+<!-- Show response page on success -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <title>Application Status | Brew & Go</title>
     <link rel="stylesheet" href="styles/style.css" />
-    <?php if ($response_type === 'success'): ?>
-
-      <!-- Auto redirect after 2 seconds -->
-      <meta http-equiv="refresh" content="2;url=main.php">
-    <?php endif; ?>
+    <meta http-equiv="refresh" content="2;url=main.php">
 </head>
 <body>
-    <div class="response-container">
-        <?php if ($response_type === 'success'): ?>
-            <div class="response-success"><?= $response_msg ?></div>
-        <?php else: ?>
-            <div class="response-error"><?= $response_msg ?></div>
-        <?php endif; ?>
-        <a href="joinus.php"><button class="response-btn">Back to Join Us</button></a>
-        <?php if ($response_type === 'success'): ?>
-            <p class="redirect-btn">You will be redirected to the home page in 5 seconds.</p>
-        <?php endif; ?>
+    <div class="response-container" style="margin:100px auto;text-align:center;">
+        <div class="response-success" style="font-size:1.5em;margin-bottom:0.8em;"><?= htmlspecialchars($response_msg) ?></div>
+        <p>You will be redirected to the home page in 2 seconds.</p>
+        <a href="main.php"><button class="response-btn">Go Home Now</button></a>
     </div>
 </body>
 </html>
