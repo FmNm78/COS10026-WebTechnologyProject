@@ -8,16 +8,27 @@ if (!isset($_SESSION['admin_id']) || ($_SESSION['role_id'] ?? 0) != 1) {
     exit;
 }
 
+// Handle status update
+if (isset($_POST['update_status'], $_POST['job_id'], $_POST['status'])) {
+    $job_id = intval($_POST['job_id']);
+    $allowed = ['Pending', 'In Progress', 'Resolved'];
+    $status = in_array($_POST['status'], $allowed) ? $_POST['status'] : 'Pending';
+    $stmt = mysqli_prepare($conn, "UPDATE job_application SET status = ? WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, "si", $status, $job_id);
+    mysqli_stmt_execute($stmt);
+}
+
 // Fetch all job applications
 $result = mysqli_query($conn, "
     SELECT 
         id, first_name, last_name, email, phone, preferred_shift, address, postcode, city, state, 
-        photo_path, cv_path, submitted_at 
+        photo_path, cv_path, submitted_at
     FROM job_application
-    ORDER BY submitted_at DESC
-");
-?>
+    ORDER BY submitted_at DESC");
 
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,7 +55,6 @@ $result = mysqli_query($conn, "
                 <a href="admin_dashboard.php" class="admin-back-btn">← Back to Dashboard</a>
             </div>
         </header>
-
         <section class="admin-table-section">
             <table class="admin-table">
                 <thead>
@@ -73,60 +83,75 @@ $result = mysqli_query($conn, "
                     </tr>
                     <tr id="details-<?= $row['id'] ?>" class="job-details-row">
                         <td colspan="7">
-                            <div class="job-details-content">
-                                <table class="job-details-table">
-                                    <tr>
-                                        <td><strong>Address:</strong></td>
-                                        <td><?= htmlspecialchars($row['address']) ?></td>
-                                        <td><strong>Postcode:</strong></td>
-                                        <td><?= htmlspecialchars($row['postcode']) ?></td>
-                                        <td><strong>City:</strong></td>
-                                        <td><?= htmlspecialchars($row['city']) ?></td>
-                                        <td><strong>State:</strong></td>
-                                        <td><?= htmlspecialchars($row['state']) ?></td>
-                                    </tr>
-                                </table>
-                                <div class="job-details-flex-media">
-                                    <div>
-                                        <strong>Photo:</strong><br>
-                                        <?php if ($row['photo_path']): ?>
-                                            <a href="<?= htmlspecialchars($row['photo_path']) ?>" target="_blank" class="job-photo">
-                                                <img src="<?= htmlspecialchars($row['photo_path']) ?>" alt="Photo" class="job-photo-img">
+                            <div class="job-details-card">
+                                <div class="job-details-cv">
+                                    <h4>Applicant Photo & Details</h4>
+                                </div>
+                                <div class="job-details-photo-column">
+                                <div class="job-details-row-main">
+                                    <!-- LEFT: PHOTO -->
+                                    <div class="job-details-left">
+                                        <img src="<?= $row['photo_path'] ? htmlspecialchars($row['photo_path']) : 'images/default-profile.png' ?>" alt="Applicant Photo" class="job-details-photo">
+                                    </div>
+                                    <!-- RIGHT: ALL DETAILS AS TABLE -->
+                                    <div class="job-details-right">
+                                        <table class="job-details-table">
+                                            <tr>
+                                                <td><b>Name</b></td>
+                                                <td><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?></td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Email</b></td>
+                                                <td><?= htmlspecialchars($row['email']) ?></td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Phone</b></td>
+                                                <td><?= htmlspecialchars($row['phone']) ?></td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Shift</b></td>
+                                                <td><?= htmlspecialchars($row['preferred_shift']) ?></td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Address</b></td>
+                                                <td><?= htmlspecialchars($row['address']) ?></td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Postcode</b></td>
+                                                <td><?= htmlspecialchars($row['postcode']) ?></td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>City</b></td>
+                                                <td><?= htmlspecialchars($row['city']) ?></td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>State</b></td>
+                                                <td><?= htmlspecialchars($row['state']) ?></td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Submitted</b></td>
+                                                <td><?= htmlspecialchars($row['submitted_at']) ?></td>
+                                            </tr>
+                                            <tr>
+                                        </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                </div>
+                                <!-- BOTTOM: CV SECTION -->
+                                <div class="job-details-cv">
+                                    <h4>CV / Resume</h4>
+                                    <?php if ($row['cv_path'] && strtolower(pathinfo($row['cv_path'], PATHINFO_EXTENSION)) === 'pdf'): ?>
+                                        <div class="job-cv-action-row">
+                                            <a href="<?= htmlspecialchars($row['cv_path']) ?>" target="_blank">
+                                                <button type="button" class="btn-view-pdf">View PDF in New Tab</button>
                                             </a>
-                                        <?php else: ?>
-                                            <span>N/A</span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div>
-                                        <strong>CV:</strong><br>
-                                        <?php if ($row['cv_path']): ?>
-                                            <?php
-                                            $cv_path = $row['cv_path'];
-                                            $cv_ext = strtolower(pathinfo($row['cv_path'], PATHINFO_EXTENSION));
-                                            ?>
-                                            <?php if ($cv_ext === 'pdf'): ?>
-                                                <div class="jov-cv-wrapper">
-                                                    <div class="job-cv-preview">
-                                                        <iframe src="<?= htmlspecialchars($cv_path) ?>" class="job-cv-iframe"></iframe>
-                                                    </div>
-                                                    <div class="job-cv-action-row">
-                                                        <a href="<?= htmlspecialchars($cv_path) ?>" target="_blank">
-                                                            <button type="button" class="btn-view-pdf">View PDF in New Tab</button>
-                                                        </a>
-                                                        <a href="<?= htmlspecialchars($cv_path) ?>" download>
-                                                            <button type="button" class="btn-download-pdf">Download PDF</button>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            <?php else: ?>
-                                                <a href="<?= htmlspecialchars($cv_path) ?>" download>
-                                                    <button type="button" class="btn-download-pdf">Download</button>
-                                                </a>
-                                            <?php endif; ?>
-                                        <?php else: ?>
-                                            <span>N/A</span>
-                                        <?php endif; ?>
-                                    </div>
+                                        </div>
+                                    <?php else: ?>
+                                        <a href="<?= htmlspecialchars($row['cv_path']) ?>" download>
+                                            <button type="button" class="btn-download-pdf">Download</button>
+                                        </a>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </td>

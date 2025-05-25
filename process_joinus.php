@@ -45,8 +45,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: joinus.php');
             exit;
         }
-        $cv_dir = __DIR__ . '/uploads/cvs/';
 
+        // ======== MIME type check for PDF =========
+        if ($cv_ext === 'pdf') {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $type = finfo_file($finfo, $_FILES['cv']['tmp_name']);
+            finfo_close($finfo);
+            if ($type !== 'application/pdf') {
+                $_SESSION['joinus_form'] = $form_data;
+                $_SESSION['joinus_form_error'] = 'Uploaded file is not a valid PDF document.';
+                header('Location: joinus.php');
+                exit;
+            }
+        }
+        // ==========================================
+
+        $cv_dir = __DIR__ . '/uploads/cvs/';
         if (!is_dir($cv_dir)) mkdir($cv_dir, 0777, true);
 
         $basename = pathinfo($_FILES['cv']['name'], PATHINFO_FILENAME);

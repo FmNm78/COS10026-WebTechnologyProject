@@ -4034,55 +4034,488 @@ body.login-page::before {
 }
 .btn-view-pdf:hover, .btn-download-pdf:hover { background: #1c0870; }
 
+/* === Job Applications Table === */
+.admin-table-section {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(30,50,90,0.10);
+    padding: 32px 36px;
+    margin: 0 30px 40px 60px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0;
+    font-size: 1em;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 14px 14px;
+    text-align: left;
+}
+
+.admin-table th {
+    background: #f5f6fa;
+    color: #2f0ba3;
+    font-weight: 700;
+    font-size: 1.07em;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.admin-table td {
+    background: #fff;
+    border-bottom: 1px solid #f0f1f3;
+    vertical-align: middle;
+}
+
+.admin-table tr:last-child td {
+    border-bottom: none;
+}
+
+.btn-view-details {
+    background: #2f0ba3;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 7px 18px;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.17s;
+    outline: none;
+}
+.btn-view-details:hover {
+    background: #4b26c7;
+}
+
+/* === Expandable Detail Card Row === */
 .job-details-row {
     display: none;
-    background: #f8f9fa;
+    background: #f9fafb;
 }
 
-.job-details-content {
-    padding: 18px 24px;
+/* === Detail Card === */
+.job-details-clean {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 2px 14px rgba(44,60,100,0.08);
+    padding: 32px 40px 22px 40px;
+    margin: 0 0 12px 0;
 }
 
-.job-details-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 16px;
+.job-detail-main {
+  display: flex;
+  gap: 42px;
+  align-items: center;
+  margin-bottom: 22px;
+  align-content: center;
+  justify-content: center;
 }
-.job-details-table td {
-    padding: 6px 12px;
-    border-bottom: 1px solid #eee;
+
+.job-detail-profile {
+    width: 30em;
+    text-align: center;
+    background: #f5f6fa;
+    padding: 18px 10px 18px 10px;
+    border-radius: 11px;
+    box-shadow: 0 1px 7px rgba(0,0,0,0.035);
+}
+
+.job-detail-profile h3 {
+    margin: 13px 0 13px 0;
+    font-size: 1.13em;
+    font-weight: bold;
+    letter-spacing: 0.5px;
 }
 
 .job-photo-img {
-    max-width: 120px;
-    max-height: 120px;
-    border-radius: 6px;
-    margin-top: 6px;
+    max-width: 400px;
+    max-height: 400px;
+    border-radius: 8px;
+    margin: 0 auto 10px auto;
     border: 1px solid #ddd;
     background: #fff;
+    display: block;
 }
 
-.btn-view-details, .btn-view-pdf, .btn-download-pdf {
-    background: #2f0ba3;
+.job-photo-placeholder {
+    width: 120px;
+    height: 120px;
+    background: #e3e6ee;
+    border-radius: 8px;
+    line-height: 120px;
+    color: #aaa;
+    margin: 0 auto 14px auto;
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.job-detail-field {
+    margin: 7px 0;
+    font-size: 15px;
+}
+.field-label {
+    color: #65687a;
+    font-weight: 500;
+    margin-right: 2px;
+    font-size: 15px;
+}
+
+.job-detail-info {
+    flex: 1;
+    min-width: 260px;
+}
+.job-detail-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    font-size: 16px;
+}
+.job-detail-table td {
+    padding: 3px 10px 3px 0;
+    border: none;
+    font-size:18px;
+}
+
+.job-detail-table tr td:first-child {
+    color: #72737e;
+    width: 130px;
+    font-weight: 600;
+    font-size: 21px;
+}
+
+/* === CV Section === */
+.job-detail-cv-section {
+    margin-top: 10px;
+}
+.job-detail-cv-section h4 {
+    margin-bottom: 11px;
+    font-size: 2em;
+    font-weight: 600;
+    color: #2f0ba3;
+    letter-spacing: 0.4px;
+}
+
+.job-cv-action-row {
+    margin-top: 10px;
+}
+
+.btn-view-pdf, .btn-download-pdf {
+    background: #365dcf;
     color: white;
     border: none;
     border-radius: 6px;
-    padding: 6px 16px;
+    padding: 7px 17px;
     font-weight: bold;
+    font-size: 1em;
     cursor: pointer;
-    transition: background 0.2s;
-    margin-right: 8px;
+    margin-right: 10px;
+    margin-bottom: 3px;
+    transition: background 0.18s;
 }
-.btn-view-details:hover, .btn-view-pdf:hover, .btn-download-pdf:hover {
-    background: #1c0870;
+
+.btn-view-pdf:hover, .btn-download-pdf:hover {
+    background: #253fa1;
+}
+
+.job-details-card {
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 2px 14px rgba(44,60,100,0.09);
+  padding: 32px 40px 28px 40px;
+  margin: 0 0 12px 0;
+  display:flex;
+  flex-direction:column;
+  justify-content: center;
+  align-items: center;
+  width:90%;
+}
+
+.job-details-row-main {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  align-items: center;
+  justify-content: space-around;
+  width: 50em;
+}
+
+.job-details-left {
+  min-width: 220px;
+  max-width: 320px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.job-details-photo {
+  max-width: 300px;
+  max-height: 400px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  background: #fafbfc;
+  object-fit: cover;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+}
+.job-details-basic {
+  width: 100%;
+  margin-top: 3px;
+}
+.job-details-name {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #222a3a;
+  letter-spacing: 0.2px;
+}
+.job-details-meta div {
+  margin: 3px 0 3px 0;
+  color: #484c61;
+  font-size: 1em;
+  text-align: left;
+}
+
+.job-details-right {
+  flex: 1;
+  min-width: 200px;
+}
+.job-details-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.1em;
+}
+.job-details-table td {
+  padding: 7px 14px 7px 0;
+  border: none;
+  color: #2a2d38;
+}
+.job-details-table td:first-child {
+  color: #666a7a;
+  font-weight: bold;
+  min-width: 100px;
+  width: 120px;
+}
+
+/* CV Section */
+.job-details-cv {
+  margin-top: 28px;
+  margin-bottom: 10px;
+}
+
+.job-details-cv h4 {
+  font-size: 2em;
+  font-weight: 700;
+  color: #2f0ba3;
+  letter-spacing: 0.1em;
+  text-align: center;
 }
 
 .job-cv-iframe {
-    border: 0;
+    width: 600px;
+    height: 100%;
+    border: 1px solid #eee;
+    border-radius: 9px;
+    background: #f9f9fa;
+    display: block;
+}
+
+.job-cv-action-row {
+  margin-top: 10px;
+}
+
+.btn-view-pdf, .btn-download-pdf {
+  background: #365dcf;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 17px;
+  font-weight: bold;
+  font-size: 1em;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-bottom: 3px;
+  transition: background 0.18s;
+}
+.btn-view-pdf:hover, .btn-download-pdf:hover {
+  background: #253fa1;
+}
+
+.job-details-photo-column{
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.status-badge {
+    display: inline-block;
+    min-width: 90px;
+    padding: 6px 20px 6px 20px;
+    border-radius: 18px;
+    font-weight: 600;
+    font-size: 0.98em;
+    letter-spacing: 0.02em;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(40,60,90,0.10);
+    text-align: center;
+    transition: background 0.22s, box-shadow 0.18s;
+    margin: 0 2px;
+}
+
+.status-badge {
+    transition: background 0.3s, color 0.25s, box-shadow 0.18s;
+}
+
+/* Specific Statuses */
+.status-pending {
+    background: linear-gradient(90deg, #f5c542 0%, #e0a800 100%);
+    color: #fff3cd;
+    border: 1px solid #f3d580;
+    text-shadow: 0 1px 0 #bb9000;
+}
+
+.status-inprogress {
+    background: linear-gradient(90deg, #47b3ff 0%, #2b84e3 100%);
+    color: #e6f3fa;
+    border: 1px solid #90d3ff;
+    text-shadow: 0 1px 0 #1b3e56;
+}
+
+.status-resolved {
+    background: linear-gradient(90deg, #56df7d 0%, #30b566 100%);
+    color: #eaffef;
+    border: 1px solid #97e4b3;
+    text-shadow: 0 1px 0 #196836;
+}
+
+
+/* .row-status-pending    td { background: #fff5de !important; }
+.row-status-inprogress td { background: #eaf3fd !important; }
+.row-status-resolved   td { background: #e6f7ee !important; } */
+
+/* Optional: If you want even more saturated effect, use these: */
+.row-status-pending    td { background: #ffe29a !important; }
+.row-status-inprogress td { background: #b3dbfc !important; }
+.row-status-resolved   td { background: #a9efcc !important; }
+
+
+.status-badge.status-pending    { background: #f9be42; color: #543900; }
+.status-badge.status-inprogress { background: #46aef7; color: #17305c; }
+.status-badge.status-resolved   { background: #48e29e; color: #0e3520; }
+
+
+.update-status-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.update-status-form select {
+    appearance: none; /* Remove default arrow in most browsers */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: #f4f5fc;
+    border: 1.5px solid #bfc5d8;
+    color: #2f0ba3;
+    border-radius: 7px;
+    padding: 7px 36px 7px 13px;  /* More right padding for custom arrow */
+    font-size: 1em;
+    outline: none;
+    transition: border 0.18s, box-shadow 0.18s;
+    font-weight: 500;
+    box-shadow: 0 1px 4px rgba(80,110,180,0.03);
+    position: relative;
+    cursor: pointer;
+}
+
+/* Add a nice custom arrow using a background SVG */
+.update-status-form select {
+    background-image: url("data:image/svg+xml;utf8,<svg fill='royalblue' height='14' viewBox='0 0 20 20' width='14' xmlns='http://www.w3.org/2000/svg'><path d='M7 8l3 3 3-3'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 18px 18px;
+}
+
+/* Focus/active effect */
+.update-status-form select:focus {
+    border-color: #2f0ba3;
+    box-shadow: 0 0 0 2px rgba(47,11,163,0.09);
+    background-color: #fafdff;
+}
+
+.btn-update-status {
+    background: #2f0ba3;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 19px;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.18s;
+    margin-left: 7px;
+}
+.btn-update-status:hover {
+    background: #4b26c7;
+}
+
+.status-legend {
+    margin: 22px 30px 0 0;
+    padding: 15px 26px;
+    background: #f7f8fa;
     border-radius: 8px;
-    width: 100%;
-    height: 350px;
-    background: #fff;
+    font-size: 1.02em;
+    box-shadow: 0 1px 4px rgba(70,100,160,0.04);
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    width: fit-content;
+    border: 0 !important;
+}
+
+.status-legend strong {
+    margin-right: 18px;
+}
+
+.legend-box {
+    display: inline-block;
+    min-width: 85px;
+    padding: 7px 18px;
+    margin-right: 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    border: 1px solid #ddd;
+    font-size: 1em;
+}
+.legend-box.row-status-pending    { background: #fff5de; color: #a88500; border-color: #ffe6a0; }
+.legend-box.row-status-inprogress { background: #eaf3fd; color: #256db5; border-color: #b4d9fb; }
+.legend-box.row-status-resolved   { background: #e6f7ee; color: #169a5a; border-color: #a9efcc; }
+
+.aside-right{
+  display:flex;
+  flex-direction: row-reverse;
+}
+
+.btn-update-status {
+    background: #203e72;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 15px;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.18s;
+}
+.btn-update-status:hover {
+    background: #2b84e3;
 }
 
 /* Responsive Layout */

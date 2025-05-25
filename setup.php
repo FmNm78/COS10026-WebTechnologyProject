@@ -68,7 +68,7 @@ $sql = "CREATE TABLE IF NOT EXISTS membership (
   points INT DEFAULT 0,
   profile_picture VARCHAR(255) DEFAULT NULL,
   payment_slip VARCHAR(255) DEFAULT NULL,
-  status ENUM('active', 'expired') DEFAULT 'expired',
+  status ENUM('active', 'Inactive') DEFAULT 'Inactive',
   registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
 log_status(mysqli_query($conn, $sql), "Table 'membership' ready.", "Table 'membership' failed", $conn);
@@ -143,6 +143,7 @@ $sql = "CREATE TABLE IF NOT EXISTS enquiry (
   state VARCHAR(100),
   enquiry_type VARCHAR(100),
   message TEXT,
+  status ENUM('Pending', 'In Progress', 'Resolved') DEFAULT 'Pending',
   submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
 log_status(mysqli_query($conn, $sql), "Table 'enquiry' ready.", "Table 'enquiry' failed", $conn);
