@@ -23,13 +23,13 @@ $result = mysqli_query($conn, "SELECT id, member_id, first_name, last_name, emai
     <?php include 'navbar.php' ?>
 <div class="admin-wrapper">
     <?php include 'admin_sidebar.php'; ?>
-    <div class="admin-main">
-        <header class="admin-topbar">
-            <div class="admin-topbar-left">
-                <span class="admin-topbar-title">All Members</span>
+        <div class="admin-activities-main">
+        <header class="admin-activities-topbar">
+            <div class="admin-activities-topbar-left">
+                <span class="admin-activities-topbar-title">All Members</span>
             </div>
-            <div class="admin-topbar-right">
-                <a href="admin_dashboard.php" class="admin-back-btn">← Back to Dashboard</a>
+            <div class="admin-activities-topbar-right">
+                <a href="admin_dashboard.php" class="admin-activities-back-btn">← Back to Dashboard</a>
             </div>
         </header>
 
@@ -47,6 +47,7 @@ $result = mysqli_query($conn, "SELECT id, member_id, first_name, last_name, emai
                         <th>Status</th>
                         <th>Joined</th>
                         <th>Payment Slip</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -83,6 +84,9 @@ $result = mysqli_query($conn, "SELECT id, member_id, first_name, last_name, emai
                             <?php else: ?>
                                 <span>N/A</span>
                             <?php endif; ?>
+                        </td>
+                        <td>
+                            <a href="edit_members.php?id=<?= $row['id'] ?>" class="admin-activities-btn-edit">Edit</a>
                         </td>
                     </tr>
                 <?php endwhile; ?>

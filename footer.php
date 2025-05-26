@@ -1,3 +1,38 @@
+<?php
+$newsletter_message = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['newsletter_email'])) {
+    require_once 'connection.php';
+    $email = trim($_POST['newsletter_email']);
+
+    // Basic email validation
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $newsletter_message = '<span style="color:#c0392b">Please enter a valid email address.</span>';
+    } else {
+        // Check if already subscribed
+        $stmt = mysqli_prepare($conn, "SELECT id FROM newsletter_subscribers WHERE email = ?");
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_store_result($stmt);
+
+        if (mysqli_stmt_num_rows($stmt) > 0) {
+            $newsletter_message = '<span style="color:#f39c12">You have already subscribed!</span>';
+        } else {
+            // Insert new subscriber
+            $stmt = mysqli_prepare($conn, "INSERT INTO newsletter_subscribers (email) VALUES (?)");
+            mysqli_stmt_bind_param($stmt, "s", $email);
+            if (mysqli_stmt_execute($stmt)) {
+                $newsletter_message = '<span style="color:#27ae60">Thank you for subscribing!</span>';
+            } else {
+                $newsletter_message = '<span style="color:#c0392b">Subscription failed. Please try again.</span>';
+            }
+        }
+        mysqli_stmt_close($stmt);
+        mysqli_close($conn);
+    }
+}
+?>
+
+
 <footer>
     <div class="footer-container">
 
@@ -33,11 +68,13 @@
       <div class="footer-subscribe">
         <h3>Subscribe to Our Newsletter</h3>
         <p>Stay updated on new brews, seasonal activities, and exclusive promotions!</p>
-        <form action="#" method="post">
-          <input type="email" placeholder="Enter your email" required>
+        <form action="#footer" method="post" autocomplete="off">
+          <input type="email" name="newsletter_email" placeholder="Enter your email" required>
           <button type="submit">Subscribe</button>
+          <?php if (!empty($newsletter_message)) echo "<div class='newsletter-message'>{$newsletter_message}</div>"; ?>
         </form>
       </div>
+
 
     </div>
 

@@ -164,33 +164,7 @@ $sql = "CREATE TABLE IF NOT EXISTS activities (
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
 log_status(mysqli_query($conn, $sql), "Table 'activities' ready.", "Table 'activities' failed", $conn);
 
-/* --- 8. categories: Product/Event Categories --- */
-echo "<b>// 8. categories: Product or Event Categories</b><br>";
-$sql = "CREATE TABLE IF NOT EXISTS categories (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) UNIQUE NOT NULL
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
-log_status(mysqli_query($conn, $sql), "Table 'categories' ready.", "Table 'categories' failed", $conn);
-
-/* --- 9. products: Menu/Product Items --- */
-echo "<b>// 9. products: Menu/Product Items (linked to categories)</b><br>";
-$sql = "CREATE TABLE IF NOT EXISTS products (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  description TEXT,
-  price DECIMAL(10,2) NOT NULL,
-  large_price DECIMAL(10,2) DEFAULT NULL,
-  sku VARCHAR(100) UNIQUE,
-  category_id INT,
-  image_path VARCHAR(255),
-  availability ENUM('available', 'unavailable') DEFAULT 'available',
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
-log_status(mysqli_query($conn, $sql), "Table 'products' ready.", "Table 'products' failed", $conn);
-
-
-/* --- 10. topup_history: Track Each Wallet Top-Up Event --- */
+/* --- 8. topup_history: Track Each Wallet Top-Up Event --- */
 echo "<b>// 10. topup_history: Member Wallet Top-Up Transactions</b><br>";
 $sql = "CREATE TABLE IF NOT EXISTS topup_history (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -200,6 +174,20 @@ $sql = "CREATE TABLE IF NOT EXISTS topup_history (
   FOREIGN KEY (membership_id) REFERENCES membership(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
 log_status(mysqli_query($conn, $sql), "Table 'topup_history' ready.", "Table 'topup_history' failed", $conn);
+
+
+$sql = "CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+if (mysqli_query($conn, $sql)) {
+    echo "<p style='color:green;'>✅ Table <b>newsletter_subscribers</b> created or already exists.</p>";
+} else {
+    echo "<p style='color:red;'>❌ Failed to create table: " . mysqli_error($conn) . "</p>";
+}
+
 
 echo "<br>🎉 Setup complete. Please delete or secure this file after running for security.<br>";
 

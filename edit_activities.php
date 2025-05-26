@@ -1,0 +1,151 @@
+<?php
+session_start();
+require_once 'connection.php';
+date_default_timezone_set('Asia/Kuching');
+
+// Only allow admin access
+if (!isset($_SESSION['admin_id']) || ($_SESSION['role_id'] ?? 0) != 1) {
+    header("Location: login.php");
+    exit;
+}
+
+// Get activity ID and fetch existing data
+$id = intval($_GET['id'] ?? 0);
+if (!$id) {
+    header("Location: admin_activities.php");
+    exit;
+}
+$result = mysqli_query($conn, "SELECT * FROM activities WHERE id = $id LIMIT 1");
+$activity = mysqli_fetch_assoc($result);
+
+if (!$activity) {
+    header("Location: admin_activities.php");
+    exit;
+}
+
+$error = '';
+$success = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Collect fields
+    $title = trim($_POST['title'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $event_date = $_POST['event_date'] ?? '';
+    $start_time = $_POST['start_time'] ?? '';
+    $end_time = $_POST['end_time'] ?? '';
+    $location = trim($_POST['location'] ?? '');
+    $external_link = trim($_POST['external_link'] ?? '');
+    $image_path = $activity['image_path'];
+
+    // Handle image upload (optional)
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $target_dir = 'uploads/events/';
+        if (!is_dir($target_dir)) mkdir($target_dir, 0777, true);
+        $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+        $basename = uniqid('event_', true) . '.' . $ext;
+        $target_file = $target_dir . $basename;
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+            $image_path = $target_file;
+            // Optional: Delete old image file if exists
+            if (!empty($activity['image_path']) && file_exists($activity['image_path'])) {
+                unlink($activity['image_path']);
+            }
+        } else {
+            $error = "Image upload failed.";
+        }
+    }
+
+    // Validate required fields
+    if (empty($title) || empty($event_date) || empty($start_time) || empty($end_time)) {
+        $error = "Please fill in all required fields (title, date, start & end time).";
+    }
+
+    // Update in DB
+    if (empty($error)) {
+        $stmt = mysqli_prepare($conn, "
+            UPDATE activities
+            SET title=?, description=?, image_path=?, event_date=?, start_time=?, end_time=?, location=?, external_link=?
+            WHERE id=?
+        ");
+        mysqli_stmt_bind_param($stmt, 'ssssssssi', $title, $description, $image_path, $event_date, $start_time, $end_time, $location, $external_link, $id);
+        if (mysqli_stmt_execute($stmt)) {
+            $success = "Activity updated successfully!";
+            header("Location: admin_activities.php");
+            exit;
+        } else {
+            $error = "Failed to update activity: " . mysqli_error($conn);
+        }
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Activity | Brew & Go Admin</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/admin_activities.css">
+</head>
+<body class="admin-edit-activity-body">
+    <?php include 'navbar.php'; ?>
+<div class="admin-wrapper">
+    <?php include 'admin_sidebar.php';?>
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <div class="admin-topbar-left">
+                <span class="admin-topbar-title">Edit Activity</span>
+            </div>
+            <div class="admin-topbar-right">
+                <a href="admin_activities.php" class="admin-back-btn">← Back to Activities</a>
+            </div>
+        </header>
+
+        <form class="admin-add-form" action="edit_activities.php?id=<?= $activity['id'] ?>" method="post" enctype="multipart/form-data">
+            <?php if ($error): ?><div class="error"><?= $error ?></div><?php endif; ?>
+            <?php if ($success): ?><div class="success"><?= $success ?></div><?php endif; ?>
+
+            <div class="form-group">
+                <label for="title">Title<span style="color:red">*</span></label>
+                <input type="text" name="title" id="title" maxlength="255" required value="<?= htmlspecialchars($activity['title']) ?>">
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea name="description" id="description" rows="3"><?= htmlspecialchars($activity['description']) ?></textarea>
+            </div>
+            <div class="form-group">
+                <label for="image">Event Image</label>
+                <?php if (!empty($activity['image_path'])): ?>
+                    <div style="margin-bottom:10px;">
+                        <img src="<?= htmlspecialchars($activity['image_path']) ?>" alt="Current Image" style="height:48px;">
+                    </div>
+                <?php endif; ?>
+                <input type="file" name="image" id="image" accept="image/*">
+                <small>Leave empty to keep the current image.</small>
+            </div>
+            <div class="form-group">
+                <label for="event_date">Date<span style="color:red">*</span></label>
+                <input type="date" name="event_date" id="event_date" required value="<?= htmlspecialchars($activity['event_date']) ?>">
+            </div>
+            <div class="form-group">
+                <label for="start_time">Start Time<span style="color:red">*</span></label>
+                <input type="time" name="start_time" id="start_time" required value="<?= htmlspecialchars($activity['start_time']) ?>">
+            </div>
+            <div class="form-group">
+                <label for="end_time">End Time<span style="color:red">*</span></label>
+                <input type="time" name="end_time" id="end_time" required value="<?= htmlspecialchars($activity['end_time']) ?>">
+            </div>
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" name="location" id="location" maxlength="255" value="<?= htmlspecialchars($activity['location']) ?>">
+            </div>
+            <div class="form-group">
+                <label for="external_link">External Link</label>
+                <input type="url" name="external_link" id="external_link" maxlength="255" value="<?= htmlspecialchars($activity['external_link']) ?>">
+            </div>
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

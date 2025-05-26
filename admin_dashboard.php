@@ -39,16 +39,13 @@ $today_revenue = $today_revenue ?? 0.00;
 <body class="admin-dashboard-body">
     <?php include 'navbar.php' ?>
     <div class="admin-wrapper">
-    <?php include 'admin_sidebar.php' ?>
-
-    <!-- Main Content -->
-    <div class="admin-main">
-        <header class="admin-topbar">
-            <div class="admin-topbar-left">
-                <span class="admin-topbar-title">Dashboard</span>
+    <?php include 'admin_sidebar.php'; ?>
+        <div class="admin-activities-main">
+        <header class="admin-activities-topbar">
+            <div class="admin-activities-topbar-left">
+                <span class="admin-activities-topbar-title">Dashboard</span>
             </div>
         </header>
-
         <!-- Stat Cards -->
         <section class="admin-cards-row">
             <div class="admin-card">

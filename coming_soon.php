@@ -1,3 +1,12 @@
+<?php
+require_once 'connection.php';
+// Fetch upcoming activities (can also use WHERE type = 'coming' if you add that column)
+$result = mysqli_query($conn, "
+    SELECT * FROM activities
+    WHERE event_date > CURDATE()
+    ORDER BY event_date ASC
+");
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,8 +20,6 @@
 <body>
   <div id="top"></div>
 
-  <!-- Navigation -->
-  
   <?php include 'navbar.php'; ?>
 
   <section class="hero-header">
@@ -23,65 +30,64 @@
       </div>
     </div>
   </section>
-  
-  
+
   <section class="coming-intro">
-    <h2 class="coming-banner-title">Upcoming Special Event</h2>
-    <p>Mark your calendar — something exciting is brewing at Brew & Go. Catch us at <strong>Seni Kita Weekend</strong> with our handcrafted coffee booth!</p>
+    <h2 class="coming-banner-title">Upcoming Special Events</h2>
+    <p>Mark your calendar — something exciting is brewing at Brew & Go. Here are our upcoming events!</p>
   </section>
 
-  <div class="coming-event-card">
-  <!-- Media Section -->
-  <section class="coming-media">
-    <h2 class="media-section-title">Seni Kita Weekend</h2>
-    <div class="media-gallery">
-      <figure>
-        <img src="images/CS/Seni Kita Weekend 4.0.jpg" alt="Brew Booth Setup" />
-        <figcaption>Our drinks ready for the crowd</figcaption>
-      </figure>
-      <div class="media-video">
-        <video controls>
-          <source src="images/CS/Seni Kita Weekend 4.0 video.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <p class="video-caption">Sneak peek of the event vibes</p>
+  <?php if (mysqli_num_rows($result) > 0): ?>
+    <?php while ($event = mysqli_fetch_assoc($result)): ?>
+      <div class="coming-event-card">
+        <!-- Media Section -->
+        <section class="coming-media">
+          <h2 class="media-section-title"><?= htmlspecialchars($event['title']) ?></h2>
+          <div class="media-gallery">
+            <?php if (!empty($event['image_path'])): ?>
+              <figure>
+                <img src="<?= htmlspecialchars($event['image_path']) ?>" alt="Event Image" />
+                <figcaption><?= htmlspecialchars($event['title']) ?></figcaption>
+              </figure>
+            <?php endif; ?>
+            <?php /* You can add logic here to support event videos if needed */ ?>
+          </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="coming-info">
+          <h2>Event Description</h2>
+          <p><?= nl2br(htmlspecialchars($event['description'])) ?></p>
+          <dl>
+            <dt>Booth Operating Hours</dt>
+            <dd>
+              <?= date('g:i A', strtotime($event['start_time'])) ?> – 
+              <?= date('g:i A', strtotime($event['end_time'])) ?>,
+              <?= date('d M Y', strtotime($event['event_date'])) ?>
+              <?= $event['location'] ? " ({$event['location']})" : "" ?>
+            </dd>
+          </dl>
+          <?php if (!empty($event['external_link'])): ?>
+            <p>
+              <a href="<?= htmlspecialchars($event['external_link']) ?>" target="_blank" class="event-link">More Info</a>
+            </p>
+          <?php endif; ?>
+        </section>
       </div>
-      <figure>
-        <img src="images/CS/Seni Kita Weekend 4.0 v1.jpg" alt="Booth Experience" />
-        <figcaption>Visitors enjoying Brew & Go at the fair</figcaption>
-      </figure>
+    <?php endwhile; ?>
+  <?php else: ?>
+    <div class="coming-event-card" style="text-align:center;margin:40px 0;font-size:1.2em;">
+      No upcoming events at the moment.
     </div>
-  </section>
+  <?php endif; ?>
 
-    <!-- About Section -->
-    <section class="coming-info">
-      <h2>Event Description</h2>
-      <p>
-        Brew & Go is proud to participate in the <strong>Seni Kita Weekend</strong> event — a creative bazaar featuring art, culture, and coffee. 
-      </p>
-      <ol>
-        <li>We're bringing our signature drinks to HAUS KCH.</li>
-        <li>Visitors can enjoy exclusive creations only available during the event.</li>
-      </ol>
-      <dl>
-        <dt>Booth Operating Hours</dt>
-        <dd>3:00 PM – 10:00 PM, 29 March 2025 (HAUS KCH, Yun Phin Building)</dd>
-      </dl>
-    </section>
-
-  </div>
-
-  <!-- Aside -->
   <aside class="coming-aside">
     <h3>Did You Know?</h3>
-    <p>This is Brew & Go’s fourth appearance at a cultural community event — and it keeps getting better each time.</p>
+    <p>
+      This is Brew & Go’s fourth appearance at a cultural community event — and it keeps getting better each time.
+    </p>
   </aside>
 
-
-
-  <!-- Footer -->
-   <?php include 'footer.php'; ?>
-   
-    <?php include 'backtotop.php'; ?>
+  <?php include 'footer.php'; ?>
+  <?php include 'backtotop.php'; ?>
 </body>
 </html>

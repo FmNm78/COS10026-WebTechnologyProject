@@ -2692,6 +2692,11 @@ figcaption p {
   flex-direction: column;
   gap: 20px;
   transition: all 0.3s ease;
+  padding: 25px 20px;
+  width: 90%;
+  text-align:center;
+  font-size:1.2em;
+  
 }
 
 .current-event-card:hover {
@@ -4516,6 +4521,403 @@ body.login-page::before {
 }
 .btn-update-status:hover {
     background: #2b84e3;
+}
+
+
+/* --- Admin Activities Modular Styles --- */
+.admin-activities-body {
+    background: #f5f7fa;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+}
+
+/* Wrapper/Main Content */
+.admin-activities-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: row;
+}
+
+.admin-activities-main {
+    flex: 1;
+    padding: 30px 40px 60px 40px;
+    background: #f5f7fa;
+}
+
+/* Topbar/Header */
+.admin-activities-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 40px 8px 40px;
+    background: #f7f8fa;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px #0001;
+}
+
+.admin-activities-topbar-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #413a9c;
+    letter-spacing: 0.01em;
+}
+
+.admin-activities-back-btn,
+.admin-activities-add-btn {
+    display: inline-block;
+    padding: 9px 24px;
+    border-radius: 7px;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+    margin-left: 8px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.admin-activities-back-btn {
+    background: #5536c5;
+    color: #fff;
+}
+.admin-activities-back-btn:hover {
+    background: #3c2591;
+}
+.admin-activities-add-btn {
+    background: #25a7fd;
+    color: #fff;
+}
+.admin-activities-add-btn:hover {
+    background: #007acc;
+}
+
+/* Panel/Section */
+.admin-activities-panel {
+    margin: 34px 0 38px 0;
+    background: none;
+}
+
+.admin-activities-heading {
+    font-size: 22px;
+    margin: 0 0 7px 18px;
+    color: #31297b;
+    letter-spacing: 0.01em;
+    font-weight: 600;
+}
+
+/* Empty state */
+.admin-activities-empty {
+    font-size: 16px;
+    color: #6b6b6b;
+    padding: 12px 22px 18px 24px;
+    font-style: italic;
+}
+
+/* Table Styles */
+.admin-activities-table {
+    width: 97%;
+    margin: 12px auto 26px auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: 13px;
+    box-shadow: 0 4px 20px #0001;
+    overflow: hidden;
+}
+
+.admin-activities-table thead {
+    background: #e9eaf7;
+}
+
+.admin-activities-table th,
+.admin-activities-table td {
+    padding: 15px 18px;
+    text-align: left;
+    border-bottom: 1px solid #e6e6ef;
+    font-size: 16px;
+    vertical-align: middle;
+}
+
+.admin-activities-table th {
+    font-weight: bold;
+    color: #352aac;
+    background: #ececf9;
+    font-size: 17px;
+    letter-spacing: 0.02em;
+}
+
+.admin-activities-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-activities-table tbody tr:hover {
+    background: #f6f7ff;
+}
+
+.admin-activities-table img {
+    max-height: 45px;
+    border-radius: 7px;
+    box-shadow: 0 1px 6px #2221;
+}
+
+/* Status Row Coloring */
+.admin-activities-row-status-current {
+    background: #fffac3;
+}
+.admin-activities-row-status-upcoming {
+    background: #e3f6f5;
+}
+.admin-activities-row-status-past {
+    background: #f5e3e3;
+}
+
+/* Action Buttons */
+.admin-activities-btn-edit,
+.admin-activities-btn-delete {
+    font-size: 15px;
+    padding: 7px 18px;
+    border-radius: 7px;
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 7px;
+    margin-bottom: 2px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.admin-activities-btn-edit {
+    background: #4caf91;
+    color: #fff;
+}
+.admin-activities-btn-edit:hover {
+    background: #368864;
+}
+
+.admin-activities-btn-delete {
+    background: #f16363;
+    color: #fff;
+}
+.admin-activities-btn-delete:hover {
+    background: #b93131;
+}
+
+
+.btn-edit {
+  background: #4CAF50;
+  color: #fff;
+  text-decoration: none;
+}
+
+.btn-delete {
+  background: #E57373;
+  color: #fff;
+  text-decoration: none;
+}
+
+.admin-add-btn {
+  background: #2196F3;
+  color: #fff;
+  padding: 7px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+/* Add Activity Form Styles */
+.admin-add-form {
+    max-width: 600px;
+    margin: 30px auto;
+    background: #f9f9f9;
+    padding: 22px 35px 30px 35px;
+    border-radius: 13px;
+    box-shadow: 0 4px 24px #0001;
+}
+
+.admin-add-form label {
+    font-weight: 600;
+    margin-top: 12px;
+    display: block;
+}
+
+.admin-add-form input,
+.admin-add-form textarea {
+    width: 100%;
+    margin-top: 4px;
+    margin-bottom: 12px;
+    padding: 7px 8px;
+    border-radius: 6px;
+    border: 1px solid #bbb;
+}
+
+.admin-add-form button {
+    background: #2196F3;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.admin-add-form .form-group {
+    margin-bottom: 13px;
+}
+
+.admin-add-form .error {
+    color: #e53e3e;
+    margin-bottom: 12px;
+}
+
+.admin-add-form .success {
+    color: #38a169;
+    margin-bottom: 12px;
+}
+
+/* --- Admin Activities Unique Styling --- */
+.admin-activities-table {
+    width: 98%;
+    margin: 14px auto 24px auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: 13px;
+    box-shadow: 0 4px 20px #0001;
+    overflow: hidden;
+}
+
+.admin-activities-table thead {
+    background: #e9eaf7;
+}
+
+.admin-activities-table th,
+.admin-activities-table td {
+    padding: 15px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e5e5e5;
+    font-size: 16px;
+    vertical-align: middle;
+}
+
+.admin-activities-table th {
+    font-weight: bold;
+    color: #352aac;
+    background: #ececf9;
+    font-size: 17px;
+    letter-spacing: 0.02em;
+}
+
+.admin-activities-table tbody tr:last-child td {
+    border-bottom: none;
+    width: 150px;
+}
+
+.admin-activities-table tbody tr:hover {
+    background: #f6f7ff;
+}
+
+.admin-activities-table img {
+    max-height: 45px;
+    border-radius: 7px;
+    box-shadow: 0 1px 6px #2221;
+}
+
+.admin-activities-btn-edit,
+.admin-activities-btn-delete {
+    font-size: 15px;
+    padding: 7px 18px;
+    border-radius: 7px;
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 7px;
+    margin-bottom: 2px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.admin-activities-btn-edit {
+    background: #4caf91;
+    color: #fff;
+}
+
+.admin-activities-btn-edit:hover {
+    background: #368864;
+}
+
+.admin-activities-btn-delete {
+    background: #f16363;
+    color: #fff;
+}
+
+.admin-activities-btn-delete:hover {
+    background: #b93131;
+}
+
+.admin-activities-panel {
+    margin-bottom: 38px;
+}
+
+.admin-activities-heading {
+    font-size: 22px;
+    margin: 32px 0 6px 0;
+    color: #31297b;
+    letter-spacing: 0.01em;
+}
+
+.admin-activities-empty {
+    font-size: 16px;
+    color: #6b6b6b;
+    padding: 10px 20px;
+}
+
+.admin-activities-row-status-current { background: #fffac3; }
+.admin-activities-row-status-upcoming { background: #e3f6f5; }
+.admin-activities-row-status-past { background: #f5e3e3; }
+
+.current-event-wrapper{
+  display:flex;
+  align-items: center;
+}
+
+.admin-sidebar a.active {
+    background: #6b53f8;
+    color: #fff !important;
+    border-radius: 8px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px #9987ff30;
+}
+
+.admin-sidebar a:hover,
+.admin-sidebar a.active {
+    background: #6b53f8;
+    color: #fff !important;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.admin-brand-link {
+    display: block;
+    color: white;
+    font-size: 1em;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 18px 0 14px 0;
+    text-align: center;
+    letter-spacing: 0.03em;
+    transition: color 0.2s;
+}
+.admin-brand-link:hover {
+    color: #4731b7;
+    padding:10px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.newsletter-message {
+    margin-top: 8px;
+    font-size: 1em;
+    font-weight: 500;
 }
 
 /* Responsive Layout */
