@@ -38,7 +38,7 @@ echo "✅ Selected database: $dbname<br>";
 /* --- 1. Roles Table --- */
 echo "<b>// 1. roles: User/Staff/Admin Roles</b><br>";
 $sql = "CREATE TABLE IF NOT EXISTS roles (
-  id TINYINT PRIMARY KEY,
+  id TINYINT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(50) UNIQUE NOT NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
 log_status(mysqli_query($conn, $sql), "Table 'roles' ready.", "Table 'roles' failed", $conn);

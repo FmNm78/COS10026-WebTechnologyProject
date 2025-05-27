@@ -101,13 +101,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Newsletter Panel | Brew & Go Admin</title>
     <link rel="stylesheet" href="styles/style.css" />
     <link rel="stylesheet" href="styles/admin_activities.css" />
-    <style>
-      .admin-newsletter-panel { max-width:650px; margin:35px auto; background:#f9f9f9; padding:30px 40px 36px 40px; border-radius:15px; box-shadow:0 4px 24px #0001;}
-      .admin-newsletter-panel label { font-weight:600; margin-top:15px; display:block;}
-      .admin-newsletter-panel input, .admin-newsletter-panel textarea { width:100%; margin-top:4px; margin-bottom:16px; padding:9px 10px; border-radius:7px; border:1px solid #bbb;}
-      .admin-newsletter-panel button { background:#2196F3; color:#fff; padding:11px 26px; border:none; border-radius:8px; font-size:16px; margin-top:7px;}
-      .admin-newsletter-panel .feedback { margin-bottom:16px; font-weight:500;}
-    </style>
 </head>
 <body class="admin-members-body">
 <?php include 'navbar.php'; ?>
