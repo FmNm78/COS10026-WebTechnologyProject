@@ -26,14 +26,14 @@ if (!checkPagePermission($conn, $currentPage, $_SESSION['role_id'])) {
 // Get activity ID and fetch existing data
 $id = intval($_GET['id'] ?? 0);
 if (!$id) {
-    header("Location: admin_activities.php");
+    header("Location: admin_view_activities.php");
     exit;
 }
 $result = mysqli_query($conn, "SELECT * FROM activities WHERE id = $id LIMIT 1");
 $activity = mysqli_fetch_assoc($result);
 
 if (!$activity) {
-    header("Location: admin_activities.php");
+    header("Location: admin_view_activities.php");
     exit;
 }
 
@@ -84,11 +84,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_bind_param($stmt, 'ssssssssi', $title, $description, $image_path, $event_date, $start_time, $end_time, $location, $external_link, $id);
         if (mysqli_stmt_execute($stmt)) {
             $success = "Activity updated successfully!";
-            header("Location: admin_activities.php");
+            header("Location: admin_view_activities.php");
             exit;
         } else {
             $error = "Failed to update activity: " . mysqli_error($conn);
         }
+    }
+}
+
+// Only allow delete if admin or operator
+$is_admin = ($_SESSION['role_id'] ?? 0) == 1;
+$is_operator = ($_SESSION['role_id'] ?? 0) == 2;
+
+// Handle Delete (POST for safety)
+if (($is_admin || $is_operator) && isset($_POST['delete_activity']) && $_POST['delete_activity'] == '1') {
+    $id = intval($_GET['id'] ?? 0);
+    if ($id > 0) {
+        // Optional: Delete image file as well
+        if (!empty($activity['image_path']) && file_exists($activity['image_path'])) {
+            unlink($activity['image_path']);
+        }
+        mysqli_query($conn, "DELETE FROM activities WHERE id = $id");
+        header("Location: admin_view_activities.php");
+        exit;
     }
 }
 ?>
@@ -99,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <title>Edit Activity | Brew & Go Admin</title>
     <link rel="stylesheet" href="styles/style.css">
-    <link rel="stylesheet" href="styles/admin_activities.css">
+    <link rel="stylesheet" href="styles/admin_view_activities.css">
 </head>
 <body class="admin-edit-activity-body">
     <?php include 'navbar.php'; ?>
@@ -111,11 +129,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <span class="admin-topbar-title">Edit Activity</span>
             </div>
             <div class="admin-topbar-right">
-                <a href="admin_activities.php" class="admin-back-btn">← Back to Activities</a>
+                <a href="admin_view_activities.php" class="admin-back-btn">← Back to Activities</a>
             </div>
         </header>
-
-        <form class="admin-add-form" action="edit_activities.php?id=<?= $activity['id'] ?>" method="post" enctype="multipart/form-data">
+<div class="admin-add-form">
+        <form action="edit_activities.php?id=<?= $activity['id'] ?>" method="post" enctype="multipart/form-data">
             <?php if ($error): ?><div class="error"><?= $error ?></div><?php endif; ?>
             <?php if ($success): ?><div class="success"><?= $success ?></div><?php endif; ?>
 
@@ -159,6 +177,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <button type="submit">Save Changes</button>
         </form>
+        <?php if ($is_admin || $is_operator): ?>
+            <form method="post" onsubmit="return confirm('Are you sure you want to delete this activity?');" style="margin-top:20px;">
+                <input type="hidden" name="delete_activity" value="1">
+                <button type="submit" style="background:#dc3545;color:#fff;border:none;padding:8px 16px;border-radius:6px;">
+                    Delete Activity
+                </button>
+            </form>
+        <?php endif; ?>
+        </div>
     </div>
 </div>
 </body>

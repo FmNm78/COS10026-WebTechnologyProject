@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8" />
     <title>Edit Member | Brew & Go Admin</title>
     <link rel="stylesheet" href="styles/style.css" />
-    <link rel="stylesheet" href="styles/admin_activities.css" />
+    <link rel="stylesheet" href="styles/admin_view_activities.css" />
 </head>
 <body class="admin-members-body">
 <?php include 'navbar.php'; ?>

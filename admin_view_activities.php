@@ -23,14 +23,6 @@ if (!checkPagePermission($conn, $currentPage, $_SESSION['role_id'])) {
     exit;
 }
 
-// Handle Delete
-if (isset($_GET['delete_id'])) {
-    $id = intval($_GET['delete_id']);
-    mysqli_query($conn, "DELETE FROM activities WHERE id = $id");
-    header("Location: admin_view_activities.php");
-    exit;
-}
-
 // Fetch all activities
 $result = mysqli_query($conn, "SELECT * FROM activities ORDER BY event_date DESC, start_time DESC");
 
@@ -115,7 +107,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 </td>
                                 <td>
                                     <a href="edit_activities.php?id=<?= $row['id'] ?>" class="admin-activities-btn-edit">Edit</a>
-                                    <a href="admin_view_activities.php?delete_id=<?= $row['id'] ?>" class="admin-activities-btn-delete" onclick="return confirm('Delete this activity?')">Delete</a>
                                 </td>
                             </tr>
                         <?php endforeach;?>
@@ -158,7 +149,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 </td>
                                 <td>
                                     <a href="edit_activities.php?id=<?= $row['id'] ?>" class="admin-activities-btn-edit">Edit</a>
-                                    <a href="admin_view_activities.php?delete_id=<?= $row['id'] ?>" class="admin-activities-btn-delete" onclick="return confirm('Delete this activity?')">Delete</a>
                                 </td>
                             </tr>
                         <?php endforeach;?>
@@ -201,7 +191,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 </td>
                                 <td>
                                     <a href="edit_activities.php?id=<?= $row['id'] ?>" class="admin-activities-btn-edit">Edit</a>
-                                    <a href="admin_view_activities.php?delete_id=<?= $row['id'] ?>" class="admin-activities-btn-delete" onclick="return confirm('Delete this activity?')">Delete</a>
                                 </td>
                             </tr>
                         <?php endforeach;?>

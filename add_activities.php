@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_bind_param($stmt, 'ssssssss', $title, $description, $image_path, $event_date, $start_time, $end_time, $location, $external_link);
         if (mysqli_stmt_execute($stmt)) {
             $success = "Activity added successfully!";
-            header("Location: admin_activities.php");
+            header("Location: admin_view_activities.php");
             exit;
         } else {
             $error = "Failed to add activity: " . mysqli_error($conn);
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <span class="admin-topbar-title">Add New Activity</span>
             </div>
             <div class="admin-topbar-right">
-                <a href="admin_activities.php" class="admin-back-btn">← Back to Activities</a>
+                <a href="admin_view_activities.php" class="admin-back-btn">← Back to Activities</a>
             </div>
         </header>
 

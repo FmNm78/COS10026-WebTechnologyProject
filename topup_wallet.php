@@ -29,6 +29,20 @@ if (mysqli_stmt_execute($stmt)) {
     mysqli_stmt_execute($stmt2);
     mysqli_stmt_close($stmt2);
 
+    // ------ AUTO ACTIVATE STATUS IF wallet >= 30 ------
+    $sql3 = "SELECT wallet FROM membership WHERE id = ?";
+    $stmt3 = mysqli_prepare($conn, $sql3);
+    mysqli_stmt_bind_param($stmt3, "i", $membership_id);
+    mysqli_stmt_execute($stmt3);
+    mysqli_stmt_bind_result($stmt3, $new_wallet);
+    mysqli_stmt_fetch($stmt3);
+    mysqli_stmt_close($stmt3);
+
+    if ($new_wallet >= 30) {
+        mysqli_query($conn, "UPDATE membership SET status = 'active' WHERE id = $membership_id");
+    }
+    // --------------------------------------------------
+
     $_SESSION['topup_msg'] = "Wallet topped up successfully by RM $amount!";
 } else {
     $_SESSION['topup_error'] = "Failed to top up wallet. " . mysqli_error($conn);

@@ -96,12 +96,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     // Insert into user table (with hashed password!)
                     $hash = password_hash($password, PASSWORD_DEFAULT);
+                    $status = 'inactive';
                     $sql_user = "INSERT INTO user (username, password, membership_id, role_id) VALUES (?, ?, ?, 4)";
                     $stmt3 = mysqli_prepare($conn, $sql_user);
                     mysqli_stmt_bind_param($stmt3, "ssi", $login_id, $hash, $membership_id);
                     $user_success = mysqli_stmt_execute($stmt3);
                     mysqli_stmt_close($stmt3);
-
                     $response_type = ($user_success) ? 'success' : 'error';
                     $response_msg = ($user_success)
                         ? 'Membership registration successful! <br> You may now log in as a member.'

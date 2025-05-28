@@ -11,53 +11,147 @@ if (
     exit;
 }
 
+// Set variables for repopulation
+$member_id = '';
+$first_name = '';
+$last_name = '';
+$email = '';
+$phone = '';
+$wallet = '0.00';
+$points = '0';
+$status = 'inactive';
+$password = '';
+$payment_slip = '';
+
 $error = '';
 $success = '';
 
+// Only override variables if POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $member_id = trim($_POST['member_id'] ?? '');
     $first_name = trim($_POST['first_name'] ?? '');
     $last_name = trim($_POST['last_name'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
-    $wallet = floatval($_POST['wallet'] ?? 0);
-    $points = intval($_POST['points'] ?? 0);
-    $status = strtolower(trim($_POST['status'] ?? 'active'));
+    $wallet = trim($_POST['wallet'] ?? '0.00');
+    $points = '0'; // Should always start at 0
+    $status = 'inactive'; // Default
     $registered_at = date('Y-m-d H:i:s');
-    $payment_slip = '';
+    $password = trim($_POST['password'] ?? '');
+    $payment_slip = ''; // You never repopulate files for security reasons
 
-    // Handle payment slip upload (image/pdf)
+    // Set status based on wallet
+    if (floatval($wallet) > 30) {
+        $status = 'active';
+    }
+
+    // File upload logic (unchanged)
     if (isset($_FILES['payment_slip']) && $_FILES['payment_slip']['error'] === UPLOAD_ERR_OK) {
         $target_dir = 'uploads/payment_slips/';
         if (!is_dir($target_dir)) mkdir($target_dir, 0777, true);
         $ext = strtolower(pathinfo($_FILES['payment_slip']['name'], PATHINFO_EXTENSION));
-        $basename = uniqid('slip_', true) . '.' . $ext;
-        $target_file = $target_dir . $basename;
-        if (move_uploaded_file($_FILES['payment_slip']['tmp_name'], $target_file)) {
-            $payment_slip = $target_file;
+        $allowed_ext = ['jpg', 'jpeg', 'png', 'pdf'];
+        if (!in_array($ext, $allowed_ext)) {
+            $error = "Invalid payment slip file type. Only JPG, JPEG, PNG, or PDF allowed.";
         } else {
-            $error = "Payment slip upload failed.";
+            $basename = uniqid('slip_', true) . '.' . $ext;
+            $target_file = $target_dir . $basename;
+            if (move_uploaded_file($_FILES['payment_slip']['tmp_name'], $target_file)) {
+                $payment_slip = $target_file;
+            } else {
+                $error = "Payment slip upload failed.";
+            }
         }
     }
 
-    if (!$member_id || !$first_name || !$last_name || !$email || !$phone) {
+    // Validate required fields
+    if (!$member_id || !$first_name || !$last_name || !$email || !$phone || !$password) {
         $error = "Please fill in all required fields.";
     }
 
     if (!$error) {
+        // Duplicate checks (unchanged)...
+        $stmt_check_member_id = mysqli_prepare($conn, "SELECT id FROM membership WHERE member_id = ?");
+        mysqli_stmt_bind_param($stmt_check_member_id, "s", $member_id);
+        mysqli_stmt_execute($stmt_check_member_id);
+        mysqli_stmt_store_result($stmt_check_member_id);
+        $member_id_exists = mysqli_stmt_num_rows($stmt_check_member_id) > 0;
+        mysqli_stmt_close($stmt_check_member_id);
+
+        $stmt_check_email = mysqli_prepare($conn, "SELECT id FROM membership WHERE email = ?");
+        mysqli_stmt_bind_param($stmt_check_email, "s", $email);
+        mysqli_stmt_execute($stmt_check_email);
+        mysqli_stmt_store_result($stmt_check_email);
+        $email_exists = mysqli_stmt_num_rows($stmt_check_email) > 0;
+        mysqli_stmt_close($stmt_check_email);
+
+        $stmt_check_username = mysqli_prepare($conn, "SELECT id FROM user WHERE username = ?");
+        mysqli_stmt_bind_param($stmt_check_username, "s", $member_id);
+        mysqli_stmt_execute($stmt_check_username);
+        mysqli_stmt_store_result($stmt_check_username);
+        $username_exists = mysqli_stmt_num_rows($stmt_check_username) > 0;
+        mysqli_stmt_close($stmt_check_username);
+
+        if ($member_id_exists || $email_exists || $username_exists) {
+            $error = '';
+            if ($member_id_exists) {
+                $error .= "The Member ID '$member_id' is already taken. ";
+            }
+            if ($email_exists) {
+                $error .= "The email '$email' is already registered. ";
+            }
+            if ($username_exists) {
+                $error .= "The username '$member_id' is already in use. ";
+            }
+        }
+    }
+
+    if (!$error) {
+        // Insert into membership (unchanged)
         $stmt = mysqli_prepare($conn, "
             INSERT INTO membership (member_id, first_name, last_name, email, phone, wallet, points, status, registered_at, payment_slip)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-        mysqli_stmt_bind_param($stmt, "sssssdisss",
-            $member_id, $first_name, $last_name, $email, $phone, $wallet, $points, $status, $registered_at, $payment_slip);
+        $wallet_float = floatval($wallet);
+        $points_int = intval($points);
+
+        mysqli_stmt_bind_param(
+            $stmt,
+            "sssssdisss",
+            $member_id,
+            $first_name,
+            $last_name,
+            $email,
+            $phone,
+            $wallet_float,
+            $points_int,
+            $status,
+            $registered_at,
+            $payment_slip
+        );
         if (mysqli_stmt_execute($stmt)) {
-            $success = "Member added successfully!";
-            header("Location: admin_view_members.php");
-            exit;
+            $membership_id = mysqli_insert_id($conn);
+
+            // Insert into user table with hashed password
+            $hash = password_hash($password, PASSWORD_DEFAULT);
+            $role_id = 4; // Default role for members
+            $stmt_user = mysqli_prepare($conn, "
+                INSERT INTO user (username, password, membership_id, role_id)
+                VALUES (?, ?, ?, ?)
+            ");
+            mysqli_stmt_bind_param($stmt_user, "ssii", $member_id, $hash, $membership_id, $role_id);
+            if (mysqli_stmt_execute($stmt_user)) {
+                $success = "Member added successfully!";
+                header("Location: admin_view_members.php");
+                exit;
+            } else {
+                $error = "Failed to create user account: " . mysqli_error($conn);
+            }
+            mysqli_stmt_close($stmt_user);
         } else {
             $error = "Failed to add member: " . mysqli_error($conn);
         }
+        mysqli_stmt_close($stmt);
     }
 }
 ?>
@@ -68,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8" />
     <title>Add Member | Brew & Go Admin</title>
     <link rel="stylesheet" href="styles/style.css" />
-    <link rel="stylesheet" href="styles/admin_activities.css" />
+    <link rel="stylesheet" href="styles/admin_view_activities.css" />
     <style>
       .admin-add-form { max-width:600px; margin:30px auto; background:#f9f9f9; padding:22px 35px 30px 35px; border-radius:13px; box-shadow:0 4px 24px #0001;}
       .admin-add-form label { font-weight:600; margin-top:12px; display:block;}
@@ -94,32 +188,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </header>
         <form class="admin-add-form" action="add_members.php" method="post" enctype="multipart/form-data">
             <?php if ($error): ?><div class="error"><?= $error ?></div><?php endif; ?>
+            <?php if ($success): ?><div class="success"><?= $success ?></div><?php endif; ?>
             <label for="member_id">Member ID*</label>
-            <input type="text" name="member_id" id="member_id" required>
+            <input type="text" name="member_id" id="member_id" required value="<?= htmlspecialchars($member_id) ?>">
 
             <label for="first_name">First Name*</label>
-            <input type="text" name="first_name" id="first_name" required>
+            <input type="text" name="first_name" id="first_name" required value="<?= htmlspecialchars($first_name) ?>">
 
             <label for="last_name">Last Name*</label>
-            <input type="text" name="last_name" id="last_name" required>
+            <input type="text" name="last_name" id="last_name" required value="<?= htmlspecialchars($last_name) ?>">
 
             <label for="email">Email*</label>
-            <input type="email" name="email" id="email" required>
+            <input type="email" name="email" id="email" required value="<?= htmlspecialchars($email) ?>">
 
             <label for="phone">Phone*</label>
-            <input type="text" name="phone" id="phone" required>
+            <input type="text" name="phone" id="phone" required value="<?= htmlspecialchars($phone) ?>">
 
             <label for="wallet">Wallet (RM)</label>
-            <input type="number" step="0.01" name="wallet" id="wallet">
+            <input type="number" step="0.01" name="wallet" id="wallet" value="<?= htmlspecialchars($wallet) ?>">
 
             <label for="points">Points</label>
-            <input type="number" name="points" id="points">
+            <input type="number" name="points" id="points" value="0" readonly>
 
             <label for="status">Status</label>
-            <select name="status" id="status">
-                <option value="active" selected>Active</option>
-                <option value="expired">Expired</option>
+            <select name="status" id="status" disabled>
+                <option value="inactive" <?= $status === 'inactive' ? 'selected' : '' ?>>Inactive</option>
+                <option value="active" <?= $status === 'active' ? 'selected' : '' ?>>Active</option>
             </select>
+
+            <label for="password">Password*</label>
+            <!-- For security, do NOT fill password field -->
+            <input type="password" name="password" id="password" required value="">
 
             <label for="payment_slip">Payment Slip (Image/PDF)</label>
             <input type="file" name="payment_slip" id="payment_slip" accept="image/*,.pdf">

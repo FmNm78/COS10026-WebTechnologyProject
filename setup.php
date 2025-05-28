@@ -68,7 +68,7 @@ $sql = "CREATE TABLE IF NOT EXISTS membership (
   points INT DEFAULT 0,
   profile_picture VARCHAR(255) DEFAULT NULL,
   payment_slip VARCHAR(255) DEFAULT NULL,
-  status ENUM('active', 'Inactive') DEFAULT 'Inactive',
+  status ENUM('active', 'inactive') DEFAULT 'inactive'
   registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
 log_status(mysqli_query($conn, $sql), "Table 'membership' ready.", "Table 'membership' failed", $conn);
@@ -124,6 +124,7 @@ $sql = "CREATE TABLE IF NOT EXISTS job_application (
   state VARCHAR(100),
   photo_path VARCHAR(255),
   cv_path VARCHAR(255),
+  status ENUM('Pending','Accepted','Rejected') DEFAULT 'Pending' AFTER cv_path;
   submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
 log_status(mysqli_query($conn, $sql), "Table 'job_application' ready.", "Table 'job_application' failed", $conn);

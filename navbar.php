@@ -1,15 +1,21 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-// --- Determine login status ---
-$is_admin_logged_in = isset($_SESSION['admin_id']) && ($_SESSION['role_id'] ?? 0) == 1;
-$is_member_logged_in = isset($_SESSION['user_id']) && isset($_SESSION['membership_id']);
+$role_id = $_SESSION['role_id'] ?? 0;
+$is_admin = ($role_id == 1);       // Admin
+$is_operator = ($role_id == 2);    // Operator
+$is_staff = ($role_id == 3);       // Staff
+$is_user = ($role_id == 4);        // User
 
-// Get member full name if logged in
+$is_admin_or_operator = $is_admin || $is_operator;
+$is_staff_logged_in = $is_staff && isset($_SESSION['user_id']);
+$is_user_logged_in = $is_user && isset($_SESSION['user_id']);
+$is_logged_in = isset($_SESSION['user_id']) || isset($_SESSION['admin_id']); // covers all
+
 $member_full_name = '';
-if ($is_member_logged_in && !$is_admin_logged_in) {
+if (($is_staff_logged_in || $is_user_logged_in) && isset($_SESSION['membership_id'])) {
     require_once 'connection.php';
-    $membership_id = $_SESSION['membership_id'] ?? 0;
+    $membership_id = $_SESSION['membership_id'];
     $sql = "SELECT first_name, last_name FROM membership WHERE id = ?";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "i", $membership_id);
@@ -20,6 +26,7 @@ if ($is_member_logged_in && !$is_admin_logged_in) {
     }
     mysqli_stmt_close($stmt);
 }
+
 ?>
 
 <nav class="navbar">
@@ -67,10 +74,14 @@ if ($is_member_logged_in && !$is_admin_logged_in) {
         </li>
         <li><a href="joinus.php">JOIN US</a></li>
         <li><a href="enquiry.php">ENQUIRY</a></li>
-        <?php if ($is_admin_logged_in): ?>
+        <?php if ($is_admin_or_operator): ?>
             <li><a href="admin_dashboard.php">ADMIN</a></li>
             <li><a href="logout.php">LOGOUT</a></li>
-        <?php elseif ($is_member_logged_in): ?>
+        <?php elseif ($is_staff_logged_in): ?>
+            <li><a href="profile.php"><?= $member_full_name ?></a></li>
+            <li><a href="admin_dashboard.php">VIEW</a></li>
+            <li><a href="logout.php">LOGOUT</a></li>
+        <?php elseif ($is_user_logged_in): ?>
             <li><a href="profile.php"><?= $member_full_name ?></a></li>
             <li><a href="logout.php">LOGOUT</a></li>
         <?php else: ?>

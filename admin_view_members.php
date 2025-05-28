@@ -103,7 +103,7 @@ while ($r = mysqli_fetch_assoc($res)) $role_options[$r['id']] = $r['name'];
                         <td>RM <?= htmlspecialchars(number_format($row['wallet'], 2)) ?></td>
                         <td><?= htmlspecialchars($row['points']) ?></td>
                         <td>
-                            <span class="status-badge <?= $row['status'] === 'active' ? 'active' : 'expired' ?>">
+                            <span class="status-badge <?= $row['status'] === 'active' ? 'active' : 'inactive' ?>">
                                 <?= ucfirst($row['status']) ?>
                             </span>
                         </td>
