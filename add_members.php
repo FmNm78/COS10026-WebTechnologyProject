@@ -2,8 +2,11 @@
 session_start();
 require_once 'connection.php';
 
-// Only allow admin
-if (!isset($_SESSION['admin_id']) || ($_SESSION['role_id'] ?? 0) != 1) {
+// Check login and role
+if (
+    !isset($_SESSION['role_id']) || 
+    (!isset($_SESSION['admin_id']) && !isset($_SESSION['user_id']))
+) {
     header("Location: login.php");
     exit;
 }

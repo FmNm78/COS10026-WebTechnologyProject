@@ -26,15 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin_result = mysqli_stmt_get_result($admin_stmt);
 
         if ($admin_row = mysqli_fetch_assoc($admin_result)) {
-            // (For max security, hash admin passwords too!)
+            // WARNING: use password_hash for admin passwords in production!
             if (strtolower($password) === strtolower($admin_row['password'])) {
                 $_SESSION['admin_id'] = $admin_row['id'];
                 $_SESSION['role'] = 'admin';
-                $_SESSION['role_id'] = 1;
+                $_SESSION['role_id'] = 1; // hardcoded for admin
                 $_SESSION['username'] = 'admin';
                 $_SESSION['login_time'] = time();
 
-                // Success HTML for admin, output below (no redirect)
                 $display_name = 'Admin';
                 $role_label = 'Administrator';
                 $welcome_icon = '👑';
@@ -48,30 +47,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Normal user login
-    $sql = "SELECT id, username, password, membership_id FROM user WHERE username = ?";
+    // Normal user login (grab role_id from DB!)
+    $sql = "SELECT id, username, password, membership_id, role_id FROM user WHERE username = ?";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "s", $login_id);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_store_result($stmt);
 
     if (mysqli_stmt_num_rows($stmt) === 1) {
-        mysqli_stmt_bind_result($stmt, $user_id, $username, $hash, $membership_id);
+        mysqli_stmt_bind_result($stmt, $user_id, $username, $hash, $membership_id, $role_id);
         mysqli_stmt_fetch($stmt);
 
         if (password_verify($password, $hash)) {
             $_SESSION['user_id'] = $user_id;
             $_SESSION['username'] = $username;
             $_SESSION['membership_id'] = $membership_id;
+            $_SESSION['role_id'] = $role_id; // SET role_id in session!
             $_SESSION['role'] = 'user';
             $_SESSION['login_time'] = time();
 
-            // Success HTML for member, output below (no redirect)
             $display_name = $username;
-            $role_label = 'Member';
+            // You can make this dynamic: map role_id to string if you want
+            $role_label = ($role_id == 2) ? "Operator" : (($role_id == 3) ? "Staff" : "Member");
             $welcome_icon = '✅';
-            $redirect_url = 'main.php';
+            $redirect_url = ($role_id == 1 || $role_id == 2 || $role_id == 3) ? 'admin_dashboard.php' : 'main.php';
             $custom_message = 'You are now logged in.';
+
             goto login_success;
         }
     }

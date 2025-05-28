@@ -19,7 +19,6 @@ if ($is_member_logged_in && !$is_admin_logged_in) {
         $member_full_name = htmlspecialchars($first_name . ' ' . $last_name);
     }
     mysqli_stmt_close($stmt);
-    mysqli_close($conn);
 }
 ?>
 

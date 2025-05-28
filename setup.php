@@ -188,8 +188,61 @@ if (mysqli_query($conn, $sql)) {
     echo "<p style='color:red;'>❌ Failed to create table: " . mysqli_error($conn) . "</p>";
 }
 
+/* --- 8. page_permissions: RBAC for admin dashboard --- */
+echo "<b>// 9. page_permissions: Role-Page Access</b><br>";
+$sql = "CREATE TABLE IF NOT EXISTS page_permissions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  page VARCHAR(100) NOT NULL,
+  role_id TINYINT NOT NULL,
+  can_view TINYINT(1) NOT NULL DEFAULT 1,
+  UNIQUE KEY unique_page_role (page, role_id),
+  FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+log_status(mysqli_query($conn, $sql), "Table 'page_permissions' ready.", "Table 'page_permissions' failed", $conn);
 
-echo "<br>🎉 Setup complete. Please delete or secure this file after running for security.<br>";
+// Define all pages and allowed roles for each
+$page_perms = [
+    // Restricted Pages (specific roles)
+    'admin_dashboard.php'   => [1, 2, 3],
+    
+    'admin_view_enquiries.php' => [1, 2, 3],
+    'admin_view_jobs.php'        => [1, 2],
+    
+    'admin_view_members.php' => [1, 2],
+    'add_members.php'       => [1, 2],
+    'edit_members.php'      => [1, 2],
+    'add_role.php'      => [1,2], // Super admin only
+    'admin_view_activities.php'  => [1, 2, 3],
+    'add_activities.php'    => [1, 2],
+    'edit_activities.php'   => [1, 2],
+    
+    'admin_newsletter.php'  => [1, 2],
+    'admin_view_permissions.php'  => [1,2], // Super admin only
+];
+
+// Get all roles (from your roles table)
+$role_ids = [];
+$result = mysqli_query($conn, "SELECT id FROM roles");
+while ($row = mysqli_fetch_assoc($result)) {
+    $role_ids[] = $row['id'];
+}
+
+// Seed permissions
+foreach ($page_perms as $page => $allowed_roles) {
+    foreach ($role_ids as $role_id) {
+        $can_view = in_array($role_id, $allowed_roles) ? 1 : 0;
+        $page_escaped = mysqli_real_escape_string($conn, $page);
+        $check = mysqli_query($conn, "SELECT id FROM page_permissions WHERE page='$page_escaped' AND role_id=$role_id");
+        if (mysqli_num_rows($check) === 0) {
+            $sql = "INSERT INTO page_permissions (page, role_id, can_view) VALUES ('$page_escaped', $role_id, $can_view)";
+            mysqli_query($conn, $sql);
+        } else {
+            $sql = "UPDATE page_permissions SET can_view=$can_view WHERE page='$page_escaped' AND role_id=$role_id";
+            mysqli_query($conn, $sql);
+        }
+    }
+}
+echo "✅ Page permissions seeded.<br>";
 
 mysqli_close($conn);
 ?>

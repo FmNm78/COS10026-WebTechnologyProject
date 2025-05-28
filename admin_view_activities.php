@@ -1,11 +1,25 @@
 <?php
 session_start();
 require_once 'connection.php';
-date_default_timezone_set('Asia/Kuching');
+require_once 'auth.php';
 
-// Only allow admin access
-if (!isset($_SESSION['admin_id']) || ($_SESSION['role_id'] ?? 0) != 1) {
+$currentPage = basename($_SERVER['PHP_SELF']);
+
+// Set timezone for correct revenue date calculation!
+date_default_timezone_set('Asia/Kuala_Lumpur');
+
+// Check login and role
+if (
+    !isset($_SESSION['role_id']) || 
+    (!isset($_SESSION['admin_id']) && !isset($_SESSION['user_id']))
+) {
     header("Location: login.php");
+    exit;
+}
+
+// **Check page permission by role!**
+if (!checkPagePermission($conn, $currentPage, $_SESSION['role_id'])) {
+    header("Location: no_access.php");
     exit;
 }
 
@@ -13,7 +27,7 @@ if (!isset($_SESSION['admin_id']) || ($_SESSION['role_id'] ?? 0) != 1) {
 if (isset($_GET['delete_id'])) {
     $id = intval($_GET['delete_id']);
     mysqli_query($conn, "DELETE FROM activities WHERE id = $id");
-    header("Location: admin_activities.php");
+    header("Location: admin_view_activities.php");
     exit;
 }
 
@@ -62,8 +76,8 @@ while ($row = mysqli_fetch_assoc($result)) {
                 <span class="admin-activities-topbar-title">Manage Activities</span>
             </div>
             <div class="admin-activities-topbar-right">
-                <a href="admin_dashboard.php" class="admin-activities-back-btn">← Back to Dashboard</a>
                 <a href="add_activities.php" class="admin-activities-add-btn" style="margin-left:15px;">＋ Add New Activity</a>
+                <a href="admin_dashboard.php" class="admin-activities-back-btn">← Back to Dashboard</a>
             </div>
         </header>
 
@@ -101,7 +115,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 </td>
                                 <td>
                                     <a href="edit_activities.php?id=<?= $row['id'] ?>" class="admin-activities-btn-edit">Edit</a>
-                                    <a href="admin_activities.php?delete_id=<?= $row['id'] ?>" class="admin-activities-btn-delete" onclick="return confirm('Delete this activity?')">Delete</a>
+                                    <a href="admin_view_activities.php?delete_id=<?= $row['id'] ?>" class="admin-activities-btn-delete" onclick="return confirm('Delete this activity?')">Delete</a>
                                 </td>
                             </tr>
                         <?php endforeach;?>
@@ -144,7 +158,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 </td>
                                 <td>
                                     <a href="edit_activities.php?id=<?= $row['id'] ?>" class="admin-activities-btn-edit">Edit</a>
-                                    <a href="admin_activities.php?delete_id=<?= $row['id'] ?>" class="admin-activities-btn-delete" onclick="return confirm('Delete this activity?')">Delete</a>
+                                    <a href="admin_view_activities.php?delete_id=<?= $row['id'] ?>" class="admin-activities-btn-delete" onclick="return confirm('Delete this activity?')">Delete</a>
                                 </td>
                             </tr>
                         <?php endforeach;?>
@@ -187,7 +201,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 </td>
                                 <td>
                                     <a href="edit_activities.php?id=<?= $row['id'] ?>" class="admin-activities-btn-edit">Edit</a>
-                                    <a href="admin_activities.php?delete_id=<?= $row['id'] ?>" class="admin-activities-btn-delete" onclick="return confirm('Delete this activity?')">Delete</a>
+                                    <a href="admin_view_activities.php?delete_id=<?= $row['id'] ?>" class="admin-activities-btn-delete" onclick="return confirm('Delete this activity?')">Delete</a>
                                 </td>
                             </tr>
                         <?php endforeach;?>

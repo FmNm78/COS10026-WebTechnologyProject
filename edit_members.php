@@ -1,13 +1,27 @@
 <?php
 session_start();
 require_once 'connection.php';
+require_once 'auth.php';
 
-// Only allow admin
-if (!isset($_SESSION['admin_id']) || ($_SESSION['role_id'] ?? 0) != 1) {
+$currentPage = basename($_SERVER['PHP_SELF']);
+
+// Set timezone for correct revenue date calculation!
+date_default_timezone_set('Asia/Kuala_Lumpur');
+
+// Check login and role
+if (
+    !isset($_SESSION['role_id']) || 
+    (!isset($_SESSION['admin_id']) && !isset($_SESSION['user_id']))
+) {
     header("Location: login.php");
     exit;
 }
 
+// **Check page permission by role!**
+if (!checkPagePermission($conn, $currentPage, $_SESSION['role_id'])) {
+    header("Location: no_access.php");
+    exit;
+}
 $id = intval($_GET['id'] ?? 0);
 if (!$id) {
     header("Location: admin_view_members.php");
@@ -83,15 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Edit Member | Brew & Go Admin</title>
     <link rel="stylesheet" href="styles/style.css" />
     <link rel="stylesheet" href="styles/admin_activities.css" />
-    <style>
-      .admin-add-form { max-width:600px; margin:30px auto; background:#f9f9f9; padding:22px 35px 30px 35px; border-radius:13px; box-shadow:0 4px 24px #0001;}
-      .admin-add-form label { font-weight:600; margin-top:12px; display:block;}
-      .admin-add-form input { width:100%; margin-top:4px; margin-bottom:12px; padding:7px 8px; border-radius:6px; border:1px solid #bbb;}
-      .admin-add-form select { width:100%; margin-top:4px; margin-bottom:12px; padding:7px 8px; border-radius:6px; border:1px solid #bbb;}
-      .admin-add-form button { background:#2196F3; color:#fff; padding:10px 20px; border:none; border-radius:8px; font-size:16px;}
-      .admin-add-form .error { color:#e53e3e; margin-bottom:12px;}
-      .admin-add-form .success { color:#38a169; margin-bottom:12px;}
-    </style>
 </head>
 <body class="admin-members-body">
 <?php include 'navbar.php'; ?>
@@ -141,9 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="<?= htmlspecialchars($member['payment_slip']) ?>" target="_blank">View Current</a>
                 </div>
             <?php endif; ?>
-            <input type="file" name="payment_slip" id="payment_slip" accept="image/*,.pdf">
-            <small>Leave empty to keep current payment slip.</small>
-
             <button type="submit">Save Changes</button>
         </form>
     </div>

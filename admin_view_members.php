@@ -1,15 +1,55 @@
 <?php
 session_start();
 require_once 'connection.php';
+require_once 'auth.php';
 
-// Only allow admin
-if (!isset($_SESSION['admin_id']) || ($_SESSION['role_id'] ?? 0) != 1) {
+$currentPage = basename($_SERVER['PHP_SELF']);
+
+// Set timezone for correct revenue date calculation!
+date_default_timezone_set('Asia/Kuala_Lumpur');
+
+// Check login and role
+if (
+    !isset($_SESSION['role_id']) || 
+    (!isset($_SESSION['admin_id']) && !isset($_SESSION['user_id']))
+) {
     header("Location: login.php");
     exit;
 }
 
+// **Check page permission by role!**
+if (!checkPagePermission($conn, $currentPage, $_SESSION['role_id'])) {
+    header("Location: no_access.php");
+    exit;
+}
 // Fetch all members
-$result = mysqli_query($conn, "SELECT id, member_id, first_name, last_name, email, phone, wallet, points, status, registered_at, payment_slip FROM membership ORDER BY registered_at DESC");
+// Fetch all members + their roles
+$sql = "SELECT m.id, m.member_id, m.first_name, m.last_name, m.email, m.phone, m.wallet, m.points, m.status, m.registered_at, m.payment_slip,
+               u.role_id, r.name AS role_name, u.id AS user_id
+        FROM membership m
+        LEFT JOIN user u ON m.id = u.membership_id
+        LEFT JOIN roles r ON u.role_id = r.id
+        ORDER BY m.registered_at DESC";
+$result = mysqli_query($conn, $sql);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_id'], $_POST['new_role_id'])) {
+    $user_id = intval($_POST['user_id']);
+    $new_role_id = intval($_POST['new_role_id']);
+    if ($user_id > 0 && $new_role_id > 0) {
+        $update_stmt = mysqli_prepare($conn, "UPDATE user SET role_id = ? WHERE id = ?");
+        mysqli_stmt_bind_param($update_stmt, "ii", $new_role_id, $user_id);
+        mysqli_stmt_execute($update_stmt);
+        mysqli_stmt_close($update_stmt);
+        // Optional: show a message or redirect to avoid resubmission
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit;
+    }
+}
+
+// Fetch all possible roles for dropdown
+$role_options = [];
+$res = mysqli_query($conn, "SELECT id, name FROM roles ORDER BY id ASC");
+while ($r = mysqli_fetch_assoc($res)) $role_options[$r['id']] = $r['name'];
 ?>
 
 <!DOCTYPE html>
@@ -29,6 +69,7 @@ $result = mysqli_query($conn, "SELECT id, member_id, first_name, last_name, emai
                 <span class="admin-activities-topbar-title">All Members</span>
             </div>
             <div class="admin-activities-topbar-right">
+                <a href="add_members.php" class="admin-activities-add-btn" style="margin-left:15px;">＋ Add New Member</a>
                 <a href="admin_dashboard.php" class="admin-activities-back-btn">← Back to Dashboard</a>
             </div>
         </header>
@@ -45,6 +86,7 @@ $result = mysqli_query($conn, "SELECT id, member_id, first_name, last_name, emai
                         <th>Wallet</th>
                         <th>Points</th>
                         <th>Status</th>
+                        <th>Role</th>
                         <th>Joined</th>
                         <th>Payment Slip</th>
                         <th>Actions</th>
@@ -64,6 +106,22 @@ $result = mysqli_query($conn, "SELECT id, member_id, first_name, last_name, emai
                             <span class="status-badge <?= $row['status'] === 'active' ? 'active' : 'expired' ?>">
                                 <?= ucfirst($row['status']) ?>
                             </span>
+                        </td>
+                        <td>
+                            <?php if ($row['user_id']): ?>
+                                <form method="POST" style="display:inline;">
+                                    <input type="hidden" name="user_id" value="<?= $row['user_id'] ?>">
+                                    <select name="new_role_id" onchange="this.form.submit()" style="min-width:90px;">
+                                        <?php foreach ($role_options as $rid => $rname): ?>
+                                            <option value="<?= $rid ?>" <?= $row['role_id'] == $rid ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars(ucfirst($rname)) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </form>
+                            <?php else: ?>
+                                <span style="color:#aaa;">No user</span>
+                            <?php endif; ?>
                         </td>
                         <td><?= htmlspecialchars($row['registered_at']) ?></td>
                         <td>
