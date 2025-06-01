@@ -48,10 +48,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $points = intval($_POST['points'] ?? 0);
     $status = strtolower(trim($_POST['status'] ?? 'active'));
     $payment_slip = $member['payment_slip'];
+    $address = trim($_POST['address'] ?? '');
+    $sex = trim($_POST['sex'] ?? '');
+    $nationality = trim($_POST['nationality'] ?? '');
+    $profile_picture = $member['profile_picture'];
 
     // Handle payment slip upload (image/pdf)
     if (isset($_FILES['payment_slip']) && $_FILES['payment_slip']['error'] === UPLOAD_ERR_OK) {
-        $target_dir = 'uploads/payment_slips/';
+        $target_dir = 'uploads/payment_slip/';
         if (!is_dir($target_dir)) mkdir($target_dir, 0777, true);
         $ext = strtolower(pathinfo($_FILES['payment_slip']['name'], PATHINFO_EXTENSION));
         $basename = uniqid('slip_', true) . '.' . $ext;
@@ -74,11 +78,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$error) {
         $stmt = mysqli_prepare($conn, "
             UPDATE membership
-            SET member_id=?, first_name=?, last_name=?, email=?, phone=?, wallet=?, points=?, status=?, payment_slip=?
+            SET member_id=?, first_name=?, last_name=?, email=?, phone=?, address=?, sex=?, nationality=?, wallet=?, points=?, status=?, profile_picture=?, payment_slip=?
             WHERE id=?
         ");
-        mysqli_stmt_bind_param($stmt, "sssssdissi",
-            $member_id, $first_name, $last_name, $email, $phone, $wallet, $points, $status, $payment_slip, $id);
+        mysqli_stmt_bind_param($stmt, "ssssssssddssss",
+            $member_id, $first_name, $last_name, $email, $phone, $address, $sex, $nationality, $wallet, $points, $status, $profile_picture, $payment_slip, $id);
         if (mysqli_stmt_execute($stmt)) {
             $success = "Member updated successfully!";
             header("Location: admin_view_members.php");
@@ -113,6 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </header>
         <form class="admin-add-form" action="edit_members.php?id=<?= $member['id'] ?>" method="post" enctype="multipart/form-data">
             <?php if ($error): ?><div class="error"><?= $error ?></div><?php endif; ?>
+
             <label for="member_id">Member ID*</label>
             <input type="text" name="member_id" id="member_id" required value="<?= htmlspecialchars($member['member_id']) ?>">
 
@@ -128,6 +133,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="phone">Phone*</label>
             <input type="text" name="phone" id="phone" required value="<?= htmlspecialchars($member['phone']) ?>">
 
+            <label for="address">Address</label>
+            <input type="text" name="address" id="address" value="<?= htmlspecialchars($member['address']) ?>">
+
+            <label for="sex">Sex</label>
+            <select name="sex" id="sex">
+                <option value="">--</option>
+                <option value="Male" <?= $member['sex']=='Male'?'selected':'' ?>>Male</option>
+                <option value="Female" <?= $member['sex']=='Female'?'selected':'' ?>>Female</option>
+            </select>
+
+            <label for="nationality">Nationality</label>
+            <input type="text" name="nationality" id="nationality" value="<?= htmlspecialchars($member['nationality']) ?>">
+
             <label for="wallet">Wallet (RM)</label>
             <input type="number" step="0.01" name="wallet" id="wallet" value="<?= htmlspecialchars($member['wallet']) ?>">
 
@@ -140,14 +158,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <option value="expired"<?= $member['status'] === 'expired' ? ' selected' : '' ?>>Expired</option>
             </select>
 
+            <label for="profile_picture">Profile Picture (Image)</label>
+            <?php if (!empty($member['profile_picture'])): ?>
+                <div style="margin-bottom:10px;">
+                    <a href="<?= htmlspecialchars($member['profile_picture']) ?>" target="_blank">View Current</a>
+                </div>
+            <?php endif; ?>
+            <input type="file" name="profile_picture" id="profile_picture" accept="image/*">
+
             <label for="payment_slip">Payment Slip (Image/PDF)</label>
             <?php if (!empty($member['payment_slip'])): ?>
                 <div style="margin-bottom:10px;">
                     <a href="<?= htmlspecialchars($member['payment_slip']) ?>" target="_blank">View Current</a>
                 </div>
             <?php endif; ?>
-            <button type="submit">Save Changes</button>
-        </form>
+            <input type="file" name="payment_slip" id="payment_slip" accept="image/*,.pdf">
+
+            <div class="action-button-wrapper">
+                <button type="submit" class="admin-add-button">Save Changes</button>
+            </form>
+                <form action="delete_member.php" method="post">
+                    <input type="hidden" name="id" value="<?= $member['id'] ?>">
+                    <button type="submit" class="btn-delete-member">Delete Member</button>
+                </form>
+            </div>
     </div>
 </div>
 </body>

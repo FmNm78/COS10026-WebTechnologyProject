@@ -1,3 +1,34 @@
+<?php
+require_once 'connection.php';
+
+// Get search query from GET parameter
+$search_query = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : '';
+
+// Fetch all Artisan Brew products from the database
+$sql = "SELECT * FROM products WHERE category_id = 2";
+if (!empty($search_query)) {
+    $sql .= " AND LOWER(name) LIKE '%" . mysqli_real_escape_string($conn, $search_query) . "%'";
+}
+$sql .= " ORDER BY id ASC";
+$result = mysqli_query($conn, $sql);
+
+if (!$result) {
+    die("Error fetching products: " . mysqli_error($conn));
+}
+
+$all_products = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+// Separate products into grid (first 4) and all drinks
+$grid_drinks = array_slice($all_products, 0, 4); // Limit to first 4 for the grid
+$all_drinks = $all_products; // All products for the pricing table
+
+// Filter grid drinks based on search
+$filtered_grid_drinks = array_filter($grid_drinks, fn($drink) => $search_query === '' || stripos(strtolower($drink['name']), $search_query) !== false);
+
+// Filter all drinks based on search
+$filtered_all_drinks = array_filter($all_drinks, fn($drink) => $search_query === '' || stripos(strtolower($drink['name']), $search_query) !== false);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,121 +37,133 @@
   <meta name="author" content="Tammy Ru Xiu TAY" />
   <title>Artisan Brew - Brew & Go</title>
   <link rel="stylesheet" href="styles/style.css" />
+  <style>
+    .unavailable {
+      opacity: 0.5;
+    }
+    .unavailable .price-tag {
+      text-decoration: line-through;
+    }
+    .unavailable-label {
+      color: #888;
+      font-style: italic;
+      margin-top: 5px;
+      display: block;
+    }
+  </style>
 </head>
 <body>
-
   <div id="top"></div>
 
-<!-- Navigation -->
-<header>
-  <?php include 'navbar.php'; ?>
-</header>
+  <!-- Navigation -->
+  <header>
+    <?php include 'navbar.php'; ?>
+  </header>
 
-<!-- Header with background -->
-<header class="product-banner">
-  <div class="banner-overlay">
-    <div class="banner-text">
-      <h1>Artisan Brew</h1>
-      <a href="menu.php" class="back-button">Back</a>
+  <!-- Header with background -->
+  <header class="product-banner">
+    <div class="banner-overlay">
+      <div class="banner-text">
+        <h1>Artisan Brew</h1>
+        <a href="menu.php" class="back-button">Back</a>
+      </div>
     </div>
+  </header>
+
+  <!-- Search Bar -->
+  <div class="admin-search-sort-bar" style="margin: 20px auto; max-width: 600px; padding: 0 20px;">
+      <form method="GET" action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+          <div class="admin-search-sort-row" style="display: flex; gap: 15px; align-items: center;">
+              <div class="admin-search-sort-group">
+                  <label class="admin-search-sort-label" for="search">Search Drink:</label>
+                  <input class="admin-search-sort-input" type="text" id="search" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" placeholder="Enter drink name" style="padding: 5px;">
+              </div>
+              <button class="admin-search-sort-btn" type="submit" style="padding: 5px 10px;">Search</button>
+          </div>
+      </form>
   </div>
-</header>
 
+  <!-- Product Grid -->
+  <section class="product-grid">
+    <?php if (empty($filtered_grid_drinks)): ?>
+      <p style="text-align: center;">
+        <?php if (!empty($search_query)): ?>
+          No drinks found matching your search in Artisan Brew.
+        <?php else: ?>
+          No drinks available in Artisan Brew at the moment.
+        <?php endif; ?>
+      </p>
+    <?php else: ?>
+      <?php foreach ($filtered_grid_drinks as $drink): ?>
+        <figure class="product-card <?= $drink['availability'] === 'Unavailable' ? 'unavailable' : '' ?>">
+          <img src="<?= htmlspecialchars($drink['image_path']) ?>" alt="<?= htmlspecialchars($drink['name']) ?>" />
+          <figcaption>
+            <h3><?= htmlspecialchars($drink['name']) ?></h3>
+            <p><?= htmlspecialchars($drink['description']) ?></p>
+            <div class="price-tag">MP: RM<?= number_format($drink['price'], 2) ?> | NP: RM<?= number_format($drink['large_price'], 2) ?></div>
+            <?php if ($drink['availability'] === 'Unavailable'): ?>
+              <span class="unavailable-label">Unavailable</span>
+            <?php endif; ?>
+          </figcaption>
+        </figure>
+      <?php endforeach; ?>
+    <?php endif; ?>
+  </section>
 
-<!-- Product Grid -->
-<!-- Product Card Section -->
-<section class="product-grid">
-  <figure class="product-card">
-    <img src="images/coffee/Cheese Americano.jpeg" alt="Cheese Americano" />
-    <figcaption>
-      <h3>Cheese Americano</h3>
-      <p>Smooth black coffee with a creamy cheese foam topping.</p>
-      <div class="price-tag">MP: RM13.90 | NP: RM15.90</div>
-    </figcaption>
-  </figure>
-  
-  <figure class="product-card">
-    <img src="images/coffee/Yuzu Americano.jpeg" alt="Yuzu Americano" />
-    <figcaption>
-      <h3>Yuzu Americano</h3>
-      <p>Espresso with Japanese citrus syrup – fruity and uplifting.</p>
-      <div class="price-tag">MP: RM13.90 | NP: RM15.90</div>
-    </figcaption>
-  </figure>
-  
-  <figure class="product-card">
-    <img src="images/coffee/Orange Mocha.jpeg" alt="Orange Mocha" />
-    <figcaption>
-      <h3>Orange Mocha</h3>
-      <p>Rich chocolate with orange zest. Fruity and indulgent.</p>
-      <div class="price-tag">MP: RM12.90 | NP: RM14.90</div>
-    </figcaption>
-  </figure>
-  
-  <figure class="product-card">
-    <img src="images/coffee/Pistachio Latte.jpeg" alt="Pistachio Latte" />
-    <figcaption>
-      <h3>Pistachio Latte</h3>
-      <p>Nutty, creamy, and visually stunning. A unique fan favorite.</p>
-      <div class="price-tag">MP: RM15.90 | NP: RM17.90</div>
-    </figcaption>
-  </figure>
-  
-</section>
+  <!-- Pricing Table -->
+  <section class="pricing-section">
+    <h2>Menu</h2>
+    <?php if (empty($filtered_all_drinks)): ?>
+      <p style="text-align: center;">
+        <?php if (!empty($search_query)): ?>
+          No drinks found matching your search in Menu.
+        <?php else: ?>
+          No drinks available in Menu at the moment.
+        <?php endif; ?>
+      </p>
+    <?php else: ?>
+      <table>
+        <thead>
+          <tr>
+            <th>Drink</th>
+            <th>MP (RM)</th>
+            <th>NP (RM)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($filtered_all_drinks as $drink): ?>
+            <tr class="<?= $drink['availability'] === 'Unavailable' ? 'unavailable' : '' ?>">
+              <td><?= htmlspecialchars($drink['name']) ?></td>
+              <td><?= $drink['name'] === 'Extra Espresso Shot' ? '' : number_format($drink['price'], 2) ?></td>
+              <td><?= $drink['name'] === 'Extra Espresso Shot' ? number_format($drink['price'], 2) : number_format($drink['large_price'], 2) ?></td>
+              <?php if ($drink['availability'] === 'Unavailable'): ?>
+                <td colspan="3"><span class="unavailable-label">Unavailable</span></td>
+              <?php endif; ?>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    <?php endif; ?>
+  </section>
 
-<!-- Pricing Table -->
-<section class="pricing-section">
-  <h2>Menu</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Drink</th>
-        <th>MP (RM)</th>
-        <th>NP (RM)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td>Butterscotch Latte</td><td>11.90</td><td>13.90</td></tr>
-      <tr><td>Butterscotch Creme</td><td>14.90</td><td>16.90</td></tr>
-      <tr><td>Mint Latte</td><td>12.90</td><td>14.90</td></tr>
-      <tr><td>Vienna Latte</td><td>14.90</td><td>16.90</td></tr>
-      <tr><td>Pistachio Latte</td><td>15.90</td><td>17.90</td></tr>
-      <tr><td>Strawberry Latte</td><td>14.90</td><td>16.90</td></tr>
-      <tr><td>Mocha</td><td>11.90</td><td>13.90</td></tr>
-      <tr><td>Mint Mocha</td><td>12.90</td><td>14.90</td></tr>
-      <tr><td>Orange Mocha</td><td>12.90</td><td>14.90</td></tr>
-      <tr><td>Yuzu Americano</td><td>13.90</td><td>15.90</td></tr>
-      <tr><td>Cheese Americano</td><td>13.90</td><td>15.90</td></tr>
-      <tr><td>Orange Americano</td><td>13.90</td><td>15.90</td></tr>
-      <tr>
-        <td>Extra Espresso Shot</td>
-        <td colspan="2" class="centered-cell">RM2</td>
-      </tr>      
-    </tbody>
-  </table>
-</section>
+  <!-- Price Note -->
+  <aside class="price-note-aside">
+    <h2>Important Price Info</h2>
+    <ol>
+      <li><strong>MP</strong> = Member Price</li>
+      <li><strong>NP</strong> = Normal Price</li>
+      <li>Add RM2 for Oat Milk</li>
+    </ol>
+    <dl>
+      <dt>MP</dt>
+      <dd>Discounted rate for Brew & Go members.</dd>
+      <dt>NP</dt>
+      <dd>Standard price for all customers.</dd>
+    </dl>
+  </aside>
 
-<!-- Price Note -->
-<aside class="price-note-aside">
-  <h2>Important Price Info</h2>
-  <ol>
-    <li><strong>MP</strong> = Member Price</li>
-    <li><strong>NP</strong> = Normal Price</li>
-    <li>Add RM2 for Oat Milk</li>
-  </ol>
-  <dl>
-    <dt>MP</dt>
-    <dd>Discounted rate for Brew & Go members.</dd>
-    <dt>NP</dt>
-    <dd>Standard price for all customers.</dd>
-  </dl>
-</aside>
-
-
-<!-- Footer -->
-   <?php include 'footer.php'; ?>
-   
-    <?php include 'backtotop.php'; ?>
-
+  <!-- Footer -->
+  <?php include 'footer.php'; ?>
+  <?php include 'backtotop.php'; ?>
 </body>
 </html>

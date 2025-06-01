@@ -43,6 +43,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             </li>
             <?php endif; ?>
 
+            <?php if (can_view_page($conn, 'admin_view_products.php', $role_id)): ?>
+            <li>
+                <a href="admin_view_products.php"<?= $currentPage == 'admin_view_products.php' ? ' class="active"' : '' ?>>Products</a>
+            </li>
+            <?php endif; ?>
+            
             <?php if (can_view_page($conn, 'admin_view_activities.php', $role_id)): ?>
             <li>
                 <a href="admin_view_activities.php"<?= $currentPage == 'admin_view_activities.php' ? ' class="active"' : '' ?>>Activities</a>

@@ -3,10 +3,14 @@ uploads/cvs/*
 uploads/events/*
 uploads/newsletter/*
 uploads/photos/*
-uploads/payment_slips/*
+uploads/payment_slip/*
+uploads/profile_pictures/*
+uploads/products/*
 # But do NOT ignore the folders themselves
 !uploads/cvs/
 !uploads/events/
 !uploads/newsletter/
+!uploads/payment_slip/
 !uploads/photos/
-uploads/payment_slips/
+!uploads/profile_pictures/
+uploads/products/

@@ -23,8 +23,36 @@ if (!checkPagePermission($conn, $currentPage, $_SESSION['role_id'])) {
     exit;
 }
 
-// Fetch all activities
-$result = mysqli_query($conn, "SELECT * FROM activities ORDER BY event_date DESC, start_time DESC");
+// Handle search parameters
+$search_title = isset($_GET['search_title']) ? trim($_GET['search_title']) : '';
+$search_date = isset($_GET['search_date']) ? trim($_GET['search_date']) : '';
+
+// Build the SQL query with search conditions
+$sql = "SELECT * FROM activities WHERE 1=1";
+$params = [];
+$types = '';
+
+if ($search_title !== '') {
+    $sql .= " AND title LIKE ?";
+    $params[] = '%' . $search_title . '%';
+    $types .= 's';
+}
+
+if ($search_date !== '') {
+    $sql .= " AND event_date = ?";
+    $params[] = $search_date;
+    $types .= 's';
+}
+
+$sql .= " ORDER BY event_date DESC, start_time DESC";
+
+// Prepare and execute the query
+$stmt = mysqli_prepare($conn, $sql);
+if (!empty($params)) {
+    mysqli_stmt_bind_param($stmt, $types, ...$params);
+}
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
 $today = date('Y-m-d');
 $now = date('H:i:s');
@@ -48,6 +76,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         $past[] = $row; // Past events
     }
 }
+mysqli_stmt_close($stmt);
 ?>
 
 <!DOCTYPE html>
@@ -68,14 +97,32 @@ while ($row = mysqli_fetch_assoc($result)) {
                 <span class="admin-activities-topbar-title">Manage Activities</span>
             </div>
             <div class="admin-activities-topbar-right">
-                <a href="add_activities.php" class="admin-activities-add-btn" style="margin-left:15px;">＋ Add New Activity</a>
+                <a href="add_activities.php" class="admin-activities-add-btn" style="margin-left:15px;"> Add New Activity</a>
                 <a href="admin_dashboard.php" class="admin-activities-back-btn">← Back to Dashboard</a>
             </div>
         </header>
-
-        <!-- Current Activities Section -->
+        
         <section class="admin-activities-panel">
-            <h2 class="admin-activities-heading">Current Activities</h2>
+            <div class="admin-search-sort-bar">
+                <form method="GET" action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div>
+                            <label for="search_title">Title:</label>
+                            <input type="text" id="search_title" name="search_title" value="<?= htmlspecialchars($search_title) ?>" placeholder="Search by Title" style="padding: 5px;">
+                        </div>
+                        <div>
+                            <label for="search_date">Event Date:</label>
+                            <input type="date" id="search_date" name="search_date" value="<?= htmlspecialchars($search_date) ?>" style="padding: 5px;">
+                        </div>
+                        <button type="submit" style="padding: 5px 10px;">Search</button>
+                        <a href="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" class="admin-clear-search-btn">Clear</a>
+                    </div>
+                </form>
+            </div>
+            <!-- Current Activities Section -->
+            <section class="enquiryadmin-status-col enquiryadmin-pending">
+                <h2>Current Activities</h2>
+            </section>    
             <?php if (empty($current)): ?>
                 <p class="admin-activities-empty"><em>No current activities.</em></p>
             <?php else: ?>
@@ -83,7 +130,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                     <thead>
                         <tr>
                             <th>ID</th><th>Title</th><th>Date</th><th>Time</th><th>Location</th>
-                            <th>Status</th><th>External Link</th><th>Image</th><th>Actions</th>
+                            <th>External Link</th><th>Image</th><th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -94,7 +141,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 <td><?= htmlspecialchars($row['event_date']) ?></td>
                                 <td><?= htmlspecialchars($row['start_time']) ?> - <?= htmlspecialchars($row['end_time']) ?></td>
                                 <td><?= htmlspecialchars($row['location']) ?></td>
-                                <td>Current</td>
                                 <td>
                                     <?php if (!empty($row['external_link'])): ?>
                                         <a href="<?= htmlspecialchars($row['external_link']) ?>" target="_blank">Link</a>
@@ -106,7 +152,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <a href="edit_activities.php?id=<?= $row['id'] ?>" class="admin-activities-btn-edit">Edit</a>
+                                    <a href="edit_activities.php?id=<?= $row['id'] . '&' . http_build_query([
+                                        'search_title' => $search_title,
+                                        'search_date' => $search_date
+                                    ]) ?>" class="admin-activities-btn-edit">Edit</a>
                                 </td>
                             </tr>
                         <?php endforeach;?>
@@ -117,7 +166,9 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         <!-- Coming Soon Activities Section -->
         <section class="admin-activities-panel">
-            <h2 class="admin-activities-heading">Coming Soon</h2>
+            <section class="enquiryadmin-status-col enquiryadmin-pending">
+                <h2>Coming Soon</h2>
+            </section>             
             <?php if (empty($coming)): ?>
                 <p class="admin-activities-empty"><em>No upcoming activities.</em></p>
             <?php else: ?>
@@ -125,7 +176,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                     <thead>
                         <tr>
                             <th>ID</th><th>Title</th><th>Date</th><th>Time</th><th>Location</th>
-                            <th>Status</th><th>External Link</th><th>Image</th><th>Actions</th>
+                            <th>External Link</th><th>Image</th><th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -136,7 +187,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 <td><?= htmlspecialchars($row['event_date']) ?></td>
                                 <td><?= htmlspecialchars($row['start_time']) ?> - <?= htmlspecialchars($row['end_time']) ?></td>
                                 <td><?= htmlspecialchars($row['location']) ?></td>
-                                <td>Upcoming</td>
                                 <td>
                                     <?php if (!empty($row['external_link'])): ?>
                                         <a href="<?= htmlspecialchars($row['external_link']) ?>" target="_blank">Link</a>
@@ -148,7 +198,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <a href="edit_activities.php?id=<?= $row['id'] ?>" class="admin-activities-btn-edit">Edit</a>
+                                    <a href="edit_activities.php?id=<?= $row['id'] . '&' . http_build_query([
+                                        'search_title' => $search_title,
+                                        'search_date' => $search_date
+                                    ]) ?>" class="admin-activities-btn-edit">Edit</a>
                                 </td>
                             </tr>
                         <?php endforeach;?>
@@ -159,7 +212,9 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         <!-- Past Activities Section -->
         <section class="admin-activities-panel">
-            <h2 class="admin-activities-heading">Past Activities</h2>
+            <section class="enquiryadmin-status-col enquiryadmin-pending">
+                <h2>Past Activities</h2>
+            </section> 
             <?php if (empty($past)): ?>
                 <p class="admin-activities-empty"><em>No past activities.</em></p>
             <?php else: ?>
@@ -167,7 +222,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                     <thead>
                         <tr>
                             <th>ID</th><th>Title</th><th>Date</th><th>Time</th><th>Location</th>
-                            <th>Status</th><th>External Link</th><th>Image</th><th>Actions</th>
+                            <th>External Link</th><th>Image</th><th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -178,7 +233,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 <td><?= htmlspecialchars($row['event_date']) ?></td>
                                 <td><?= htmlspecialchars($row['start_time']) ?> - <?= htmlspecialchars($row['end_time']) ?></td>
                                 <td><?= htmlspecialchars($row['location']) ?></td>
-                                <td>Past</td>
                                 <td>
                                     <?php if (!empty($row['external_link'])): ?>
                                         <a href="<?= htmlspecialchars($row['external_link']) ?>" target="_blank">Link</a>
@@ -190,7 +244,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <a href="edit_activities.php?id=<?= $row['id'] ?>" class="admin-activities-btn-edit">Edit</a>
+                                    <a href="edit_activities.php?id=<?= $row['id'] . '&' . http_build_query([
+                                        'search_title' => $search_title,
+                                        'search_date' => $search_date
+                                    ]) ?>" class="admin-activities-btn-edit">Edit</a>
                                 </td>
                             </tr>
                         <?php endforeach;?>

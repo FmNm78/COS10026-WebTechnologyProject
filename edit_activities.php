@@ -123,16 +123,16 @@ if (($is_admin || $is_operator) && isset($_POST['delete_activity']) && $_POST['d
     <?php include 'navbar.php'; ?>
 <div class="admin-wrapper">
     <?php include 'admin_sidebar.php';?>
-    <div class="admin-main">
-        <header class="admin-topbar">
-            <div class="admin-topbar-left">
-                <span class="admin-topbar-title">Edit Activity</span>
+    <div class="admin-activities-main">
+        <header class="admin-activities-topbar">
+            <div class="admin-activities-topbar-left">
+                <span class="admin-activities-topbar-title">Edit Activities</span>
             </div>
             <div class="admin-topbar-right">
                 <a href="admin_view_activities.php" class="admin-back-btn">← Back to Activities</a>
             </div>
         </header>
-<div class="admin-add-form">
+    <div class="admin-add-form">
         <form action="edit_activities.php?id=<?= $activity['id'] ?>" method="post" enctype="multipart/form-data">
             <?php if ($error): ?><div class="error"><?= $error ?></div><?php endif; ?>
             <?php if ($success): ?><div class="success"><?= $success ?></div><?php endif; ?>
@@ -175,18 +175,18 @@ if (($is_admin || $is_operator) && isset($_POST['delete_activity']) && $_POST['d
                 <label for="external_link">External Link</label>
                 <input type="url" name="external_link" id="external_link" maxlength="255" value="<?= htmlspecialchars($activity['external_link']) ?>">
             </div>
-            <button type="submit">Save Changes</button>
+            <div class="admin-activities-action-btn-row">
+                <button type="submit" class="admin-add-button">Save Changes</button>
+                <?php if ($is_admin || $is_operator): ?>
+                    <!-- Delete uses a separate form for safety -->
+                    <form method="post" onsubmit="return confirm('Are you sure you want to delete this activity?');" style="display:inline;">
+                        <input type="hidden" name="delete_activity" value="1">
+                        <button type="submit" class="btn-delete-member">Delete Activity</button>
+                    </form>
+                <?php endif; ?>
+            </div>
         </form>
-        <?php if ($is_admin || $is_operator): ?>
-            <form method="post" onsubmit="return confirm('Are you sure you want to delete this activity?');" style="margin-top:20px;">
-                <input type="hidden" name="delete_activity" value="1">
-                <button type="submit" style="background:#dc3545;color:#fff;border:none;padding:8px 16px;border-radius:6px;">
-                    Delete Activity
-                </button>
-            </form>
-        <?php endif; ?>
-        </div>
-    </div>
+    </>
 </div>
 </body>
 </html>

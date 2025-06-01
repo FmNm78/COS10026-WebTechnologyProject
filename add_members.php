@@ -4,7 +4,7 @@ require_once 'connection.php';
 
 // Check login and role
 if (
-    !isset($_SESSION['role_id']) || 
+    !isset($_SESSION['role_id']) ||
     (!isset($_SESSION['admin_id']) && !isset($_SESSION['user_id']))
 ) {
     header("Location: login.php");
@@ -19,6 +19,10 @@ $email = '';
 $phone = '';
 $wallet = '0.00';
 $points = '0';
+$address = '';
+$sex = '';
+$nationality = '';
+$profile_picture = '';
 $status = 'inactive';
 $password = '';
 $payment_slip = '';
@@ -39,15 +43,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $registered_at = date('Y-m-d H:i:s');
     $password = trim($_POST['password'] ?? '');
     $payment_slip = ''; // You never repopulate files for security reasons
+    $address = trim($_POST['address'] ?? '');
+    $sex = trim($_POST['sex'] ?? '');
+    $nationality = trim($_POST['nationality'] ?? '');
 
     // Set status based on wallet
-    if (floatval($wallet) > 30) {
+    $wallet_float = floatval($wallet);
+    if ($wallet_float >= 30) {
         $status = 'active';
     }
+    $points_int = intval($points);
 
-    // File upload logic (unchanged)
-    if (isset($_FILES['payment_slip']) && $_FILES['payment_slip']['error'] === UPLOAD_ERR_OK) {
-        $target_dir = 'uploads/payment_slips/';
+    // Handle profile picture upload
+    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+        $target_dir = 'uploads/profile_pictures/';
+        if (!is_dir($target_dir)) mkdir($target_dir, 0777, true);
+        $ext = strtolower(pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION));
+        $allowed_ext = ['jpg', 'jpeg', 'png'];
+        if (!in_array($ext, $allowed_ext)) {
+            $error = "Invalid profile picture file type. Only JPG, JPEG, or PNG allowed.";
+        } else {
+            $basename = uniqid('profile_', true) . '.' . $ext;
+            $target_file = $target_dir . $basename;
+            if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $target_file)) {
+                $profile_picture = $target_file;
+            } else {
+                $error = "Profile picture upload failed.";
+            }
+        }
+    }
+
+    // Handle payment slip upload
+    if (!$error && isset($_FILES['payment_slip']) && $_FILES['payment_slip']['error'] === UPLOAD_ERR_OK) {
+        $target_dir = 'uploads/payment_slip/';
         if (!is_dir($target_dir)) mkdir($target_dir, 0777, true);
         $ext = strtolower(pathinfo($_FILES['payment_slip']['name'], PATHINFO_EXTENSION));
         $allowed_ext = ['jpg', 'jpeg', 'png', 'pdf'];
@@ -70,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$error) {
-        // Duplicate checks (unchanged)...
+        // Duplicate checks
         $stmt_check_member_id = mysqli_prepare($conn, "SELECT id FROM membership WHERE member_id = ?");
         mysqli_stmt_bind_param($stmt_check_member_id, "s", $member_id);
         mysqli_stmt_execute($stmt_check_member_id);
@@ -104,29 +132,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error .= "The username '$member_id' is already in use. ";
             }
         }
+        
+        $reserved = ['admin', 'superadmin', 'root'];
+        if (in_array(strtolower($member_id), $reserved)) {
+            $error = "The Member ID you entered is not allowed.";
+        }
+
     }
 
     if (!$error) {
-        // Insert into membership (unchanged)
+        // Insert into membership
         $stmt = mysqli_prepare($conn, "
-            INSERT INTO membership (member_id, first_name, last_name, email, phone, wallet, points, status, registered_at, payment_slip)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO membership 
+            (member_id, first_name, last_name, email, phone, address, sex, nationality, wallet, points, status, registered_at, profile_picture, payment_slip)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-        $wallet_float = floatval($wallet);
-        $points_int = intval($points);
-
         mysqli_stmt_bind_param(
             $stmt,
-            "sssssdisss",
+            "ssssssssdissss",
             $member_id,
             $first_name,
             $last_name,
             $email,
             $phone,
+            $address,
+            $sex,
+            $nationality,
             $wallet_float,
             $points_int,
             $status,
             $registered_at,
+            $profile_picture,
             $payment_slip
         );
         if (mysqli_stmt_execute($stmt)) {
@@ -189,6 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form class="admin-add-form" action="add_members.php" method="post" enctype="multipart/form-data">
             <?php if ($error): ?><div class="error"><?= $error ?></div><?php endif; ?>
             <?php if ($success): ?><div class="success"><?= $success ?></div><?php endif; ?>
+
             <label for="member_id">Member ID*</label>
             <input type="text" name="member_id" id="member_id" required value="<?= htmlspecialchars($member_id) ?>">
 
@@ -204,6 +241,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="phone">Phone*</label>
             <input type="text" name="phone" id="phone" required value="<?= htmlspecialchars($phone) ?>">
 
+            <label for="address">Address</label>
+            <input type="text" name="address" id="address" value="<?= htmlspecialchars($address ?? '') ?>">
+
+            <label for="sex">Sex</label>
+            <select name="sex" id="sex">
+                <option value="">--</option>
+                <option value="Male" <?= (isset($sex) && $sex=='Male') ? 'selected' : '' ?>>Male</option>
+                <option value="Female" <?= (isset($sex) && $sex=='Female') ? 'selected' : '' ?>>Female</option>
+            </select>
+
+            <label for="nationality">Nationality</label>
+            <input type="text" name="nationality" id="nationality" value="<?= htmlspecialchars($nationality ?? '') ?>">
+
             <label for="wallet">Wallet (RM)</label>
             <input type="number" step="0.01" name="wallet" id="wallet" value="<?= htmlspecialchars($wallet) ?>">
 
@@ -217,14 +267,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </select>
 
             <label for="password">Password*</label>
-            <!-- For security, do NOT fill password field -->
             <input type="password" name="password" id="password" required value="">
+
+            <label for="profile_picture">Profile Picture (Image)</label>
+            <input type="file" name="profile_picture" id="profile_picture" accept="image/*">
 
             <label for="payment_slip">Payment Slip (Image/PDF)</label>
             <input type="file" name="payment_slip" id="payment_slip" accept="image/*,.pdf">
 
             <button type="submit">Add Member</button>
         </form>
+
     </div>
 </div>
 </body>

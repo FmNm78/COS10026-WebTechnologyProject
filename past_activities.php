@@ -1,19 +1,33 @@
 <?php
 require_once 'connection.php';
-date_default_timezone_set('Asia/Kuching');
+date_default_timezone_set(timezoneId: 'Asia/Kuching');
 
 // Current date and time for Asia/Kuching
 $today = date('Y-m-d');
 $now = date('H:i:s');
 
-// Fetch all past activities: (date < today) OR (date = today AND end_time < now)
-$result = mysqli_query($conn, "
+// Get search query from GET parameter
+$search_query = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : '';
+
+// Build the SQL query with search filter
+$sql = "
     SELECT * FROM activities
-    WHERE event_date < '$today'
-       OR (event_date = '$today' AND end_time < '$now')
-    ORDER BY event_date DESC, start_time DESC
-");
+    WHERE (
+        event_date < '$today'
+        OR (event_date = '$today' AND end_time < '$now')
+    )
+";
+if (!empty($search_query)) {
+    $search_safe = mysqli_real_escape_string($conn, $search_query);
+    $sql .= " AND LOWER(title) LIKE '%$search_safe%'";
+}
+$sql .= " ORDER BY event_date DESC, start_time DESC";
+
+
+// Execute the query
+$result = mysqli_query($conn, $sql);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,7 +50,20 @@ $result = mysqli_query($conn, "
       </div>
     </div>
   </section>
-  
+
+  <!-- Search Bar -->
+  <div class="admin-search-sort-bar" style="margin: 20px auto; max-width: 600px; padding: 0 20px;">
+      <form method="GET" action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+          <div class="admin-search-sort-row" style="display: flex; gap: 15px; align-items: center;">
+              <div class="admin-search-sort-group">
+                  <label class="admin-search-sort-label" for="search">Search Event:</label>
+                  <input class="admin-search-sort-input" type="text" id="search" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" placeholder="Enter event name" style="padding: 5px;">
+              </div>
+              <button class="admin-search-sort-btn" type="submit" style="padding: 5px 10px;">Search</button>
+          </div>
+      </form>
+  </div>
+
   <section class="past-intro">
     <h2 class="past-banner-title">Previously at Brew & Go</h2>
     <p>Look back on the creative, caffeinated journey we've shared. Here are some of our favorite past moments!</p>
@@ -85,7 +112,7 @@ $result = mysqli_query($conn, "
     <?php endwhile; ?>
   <?php else: ?>
     <div class="past-event-card" style="text-align:center;margin:40px 0;font-size:1.2em;">
-      No past activities yet. Stay tuned for updates!
+      No past activities yet<?php if (!empty($search_query)) echo " matching your search"; ?>. Stay tuned for updates!
     </div>
   <?php endif; ?>
 
