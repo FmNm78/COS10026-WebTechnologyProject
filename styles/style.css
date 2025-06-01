@@ -5756,6 +5756,10 @@ h1 {
   margin-top: 5px;
   display: block;
 }
+
+.availability-readonly{
+  background-color: #b5b5b5;
+}
 /* Responsive Layout */
 /* Hamburger menu */
 @media (min-width: 330px) and (max-width: 1300px) {
