@@ -102,7 +102,7 @@ while ($r = mysqli_fetch_assoc($res)) $role_options[$r['id']] = $r['name'];
     <title>All Members | Brew & Go Admin</title>
     <link rel="stylesheet" href="styles/style.css" />
 </head>
-<body class="admin-members-body">
+<body>
     <?php include 'navbar.php' ?>
 <div class="admin-wrapper">
     <?php include 'admin_sidebar.php'; ?>
