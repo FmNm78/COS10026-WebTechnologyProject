@@ -3654,7 +3654,6 @@ body.login-page::before {
 }
 
 .admin-sidebar {
-    width: 220px;
     background: #232946;
     color: #fff;
     display: flex;
