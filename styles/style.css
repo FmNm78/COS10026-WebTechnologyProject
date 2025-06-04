@@ -3648,20 +3648,19 @@ body.login-page::before {
 
 .admin-wrapper {
   display: flex; /* Use flexbox to manage sidebar and main content */
-    min-height: 100vh; /* Ensure it takes the full height of the viewport */
-    width: 100%; /* Take the full width of the viewport */
-    margin: 0; /* Remove any default margins */
-    padding: 0; /* Remove any default padding */
+  min-height: 100vh; /* Ensure it takes the full height of the viewport */
+  margin: 0; /* Remove any default margins */
+  padding: 0; /* Remove any default padding */
 }
 
 .admin-sidebar {
-    width: 220px;
     background: #232946;
     color: #fff;
     display: flex;
     flex-direction: column;
     padding-top: 32px;
     border: 0 !important;
+    white-space: nowrap;
 }
 .admin-brand {
     display: flex;
@@ -4485,6 +4484,7 @@ details[open] summary {
     flex: 1;
     padding: 30px 40px 60px 40px;
     background: #f5f7fa;
+    min-height:100vh;
 }
 
 /* Topbar/Header */
