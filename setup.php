@@ -13,7 +13,7 @@ function log_status($success, $successMsg, $failMsg, $conn = null) {
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "assignment_2";
+$dbname = "assignment2";
 
 // Connect to MySQL
 $conn = mysqli_connect($servername, $username, $password);
